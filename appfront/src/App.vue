@@ -5,6 +5,7 @@ import Map from './components/Map.vue';
 
 <template>
   <div>
+    <h1>2</h1>
     <h1>1</h1>
     <h1>0</h1>
     <h1>103</h1>
