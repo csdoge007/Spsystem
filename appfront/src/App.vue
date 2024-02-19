@@ -5,11 +5,8 @@ import Map from './components/Map.vue';
 
 <template>
   <div>
-<<<<<<< HEAD
+
     <h1>hello world@@</h1>
-=======
-    <h1>hello world!</h1>
->>>>>>> dev
     <Map></Map>
     <!-- <HelloWorld></HelloWorld> -->
   </div>
