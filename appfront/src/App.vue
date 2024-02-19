@@ -9,6 +9,7 @@ import Map from './components/Map.vue';
     <h1>hello world@@</h1>
     <Map></Map>
     <!-- <HelloWorld></HelloWorld> -->
+    <h1>1</h1>
   </div>
   
 </template>
