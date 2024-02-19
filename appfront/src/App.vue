@@ -4,22 +4,16 @@ import Map from './components/Map.vue';
 </script>
 
 <template>
-  <div>
-    <h1>2</h1>
-    <h1>1</h1>
-    <h1>0</h1>
-    <h1>103</h1>
+    <div>
+        <h1>18</h1>
 
-    <h1>100</h1>
+        <h1>222</h1>
+        <h1>hello wqrld</h1>
+        <Map></Map>
+        <!-- <HelloWorld></HelloWorld> -->
+        <h1>123</h1>
 
-    <h1>222</h1>
-    <h1>hello wqrld</h1>
-    <Map></Map>
-    <!-- <HelloWorld></HelloWorld> -->
-    <h1>123</h1>
-
-  </div>
-  
+    </div>
 </template>
 
 <style scoped>
