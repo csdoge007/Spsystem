@@ -12,7 +12,7 @@ import Map from './components/Map.vue';
     <Map></Map>
     <!-- <HelloWorld></HelloWorld> -->
     <h1>123</h1>
-
+    <h1>1234</h1>
   </div>
   
 </template>
