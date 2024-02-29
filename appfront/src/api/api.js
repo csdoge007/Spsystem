@@ -8,3 +8,9 @@ export const getBooks = () => {return axios.get(`http://localhost:3000/api/books
 export const postBook = (bookName, bookAuthor) => {return axios.post(`http://localhost:3000/api/books/`, {'name': bookName, 'author': bookAuthor})}
 
 export const getPoi = () => axios.get(`http://localhost:3000/`);
+
+export const searchPoi = (name) => axios.get('http://localhost:3000/searchPoi', {
+  params: {
+    query: name
+  }
+});

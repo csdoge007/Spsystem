@@ -1,18 +1,48 @@
 <template>
-    <div id="map"></div>
+  <div id="map">
+    <el-input v-model="input" placeholder="请输入网点名称" @input="searchPosition"/>
+  </div>
 </template>
 
 <script setup>
-
+import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
-import { getPoi } from '../api/api';
+import { getPoi, searchPoi } from '../api/api';
 // 引入Leaflet对象 挂载到Vue上，便于全局使用，也可以单独页面中单独引用
-import { Map, TileLayer, marker, layerGroup, control, divIcon } from 'leaflet'
-import { onMounted } from 'vue';
+import { Map, TileLayer, marker, layerGroup, control, divIcon, icon } from 'leaflet'
+import { onMounted, ref } from 'vue';
 // const map = ref({});
 let map = null;
 let Layer = null;
 let baseLayers = {};
+// const searchedLayer = null;
+const input = ref('');
+const showSearchPoi = (data) => {
+  map.eachLayer(function (layer) {
+    if (layer !== Layer) { // 排除底图
+      map.removeLayer(layer);
+    }
+  });
+  const markers = layerGroup();
+  baseLayers['searchLayer'] = markers;
+  data.forEach(dataPoint => {
+    const { locationy, locationx, name } = dataPoint;
+    marker([locationy, locationx]).addTo(markers).bindPopup(name); // 使用红色图标
+  });
+  map.addLayer(markers);
+}
+const searchPosition = debounce(function(){
+  searchPoi(input.value).then(response => {
+    // showSearchPoi(response.data);
+    const { data } = response;
+    console.log(data);
+    if (baseLayers['searchLayer']) {
+      map.removeLayer(baseLayers['searchLayer']);
+      baseLayers['searchLayer'] = null;
+    }
+    showSearchPoi(data);
+  })
+},1000);
 const initData = () => {
     map = new Map('map')
     Layer = new TileLayer('http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}')
@@ -32,7 +62,6 @@ onMounted(() => {
     let poiImport = importPoi();
     let initBaseLayer = poiImport.then(data => {
         console.log(Object.keys(data));
-        // console.log(data);
         Object.keys(data).forEach((type) => {
 
             const markersLayer = layerGroup();
@@ -52,8 +81,17 @@ onMounted(() => {
         control.layers({ '底图': Layer }, baseLayers, { collapsed: false }).addTo(map);
         map.addLayer(baseLayers['餐饮服务']);
     });
+    // map.addLayer(searchedLayer);
 })
 // initData();
 </script>
 
-<style scoped></style>
+<style scoped>
+.el-input {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  width: 175px; /* 调整搜索框宽度 */
+  z-index: 1000; /* 确保 el-input 显示在地图之上 */
+}
+</style>
