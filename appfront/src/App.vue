@@ -6,7 +6,7 @@ import Map from './components/Map.vue';
 <template>
     <div>
 
-
+      
       <Map></Map>
 
     </div>
