@@ -10,7 +10,7 @@ export async function getPoi (req, res) {
         console.error(err);
         res.send("Error" + err);
     }
-}
+};
 
 export async function searchPoi (req, res) {
   try {
@@ -26,4 +26,4 @@ export async function searchPoi (req, res) {
     console.error(err);
     res.send("Error" + err);
   }
-}
+};

@@ -14,3 +14,9 @@ export const searchPoi = (name) => axios.get('http://localhost:3000/searchPoi', 
     query: name
   }
 });
+
+export const boxSelectPoi = (polygon) => axios.post('http://localhost:3000/boxSelectPoi', { 
+  polygon 
+});
+
+
