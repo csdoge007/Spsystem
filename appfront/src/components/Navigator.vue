@@ -13,7 +13,7 @@
       >
         <el-sub-menu index="1">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Edit /></el-icon>
             <span>企业制图</span>
           </template>
           <el-menu-item index="1-1">我的地图</el-menu-item>
@@ -32,7 +32,7 @@
         </el-sub-menu>
         <el-sub-menu index="3">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Setting /></el-icon>
             <span>基础管理</span>
           </template>
           <el-menu-item index="3-1">基础信息</el-menu-item>
@@ -43,17 +43,17 @@
   </el-row>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 import {
-  Document,
   Menu as IconMenu,
   Location,
-  Setting,
+  Edit,
+  Setting
 } from '@element-plus/icons-vue'
-const handleOpen = (key: string, keyPath: string[]) => {
+const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
 }
-const handleClose = (key: string, keyPath: string[]) => {
+const handleClose = (key, keyPath) => {
   console.log(key, keyPath)
 }
 

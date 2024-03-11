@@ -19,4 +19,7 @@ export const boxSelectPoi = (polygon) => axios.post('http://localhost:3000/boxSe
   polygon 
 });
 
+export const login = (userInfo) => axios.post('http://localhost:3000/login', {
+  userInfo
+})
 

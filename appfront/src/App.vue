@@ -1,8 +1,7 @@
 <script setup>
-// import HelloWorld from './components/HelloWorld.vue'
 import Map from './components/Map.vue';
 import Navigator from './components/Navigator.vue';
-// import Header from './components/Header.vue';
+// import Login from './views/login/index.vue';
 </script>
 
 <template>
@@ -17,6 +16,7 @@ import Navigator from './components/Navigator.vue';
         </el-main>
       </el-container>
     </el-container>
+    <!-- <Login></Login> -->
   </div>
 </template>
 
@@ -32,4 +32,4 @@ import Navigator from './components/Navigator.vue';
 .el-main {
   padding: 0;
 }
-</style>
+</style>./views/login/index.vue

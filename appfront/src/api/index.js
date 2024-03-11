@@ -1,6 +1,7 @@
 // import Vue from 'vue'
 import Axios from 'axios'
 
+Axios.defaults.timeout = 5000;
 const axiosInstance = Axios.create({
     withCredentials: true
 })
