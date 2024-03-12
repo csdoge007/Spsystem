@@ -49,7 +49,7 @@ export default function createNewDb() {
              ROW_NUMBER() OVER (PARTITION BY substring(type FROM '([^;]+)') ORDER BY gid) AS row_num
       FROM njpoi_2020
     ) AS subquery
-    WHERE row_num <= 10;`;
+    WHERE row_num <= 100;`;
     pool.query(insertTableQuery, (err, result) => {
         if (err) {
             console.error('Error executing SQL query:', err);
