@@ -1,7 +1,7 @@
 <script setup>
 import Map from './components/Map.vue';
 import Navigator from './components/Navigator.vue';
-// import Login from './views/login/index.vue';
+import Login from './views/login/index.vue';
 </script>
 
 <template>

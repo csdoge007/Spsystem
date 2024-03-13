@@ -1,8 +1,7 @@
 import express from 'express';
 import cors from './middleware/cors.js';
 import bodyParser from 'body-parser';
-import { getPoi, searchPoi } from './service/get.js';
-import { boxSelectPoi } from './service/post.js';
+import { getPoi, searchPoi, boxSelectPoi } from './controller/map.js';
 const app = express();
 
 const port = 3000;

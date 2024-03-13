@@ -34,8 +34,8 @@ const showSearchPoi = (data, wrappedLayer) => {
   baseLayers['searchLayer'] = markers;
   data.forEach(dataPoint => {
     const { locationx, locationy, name } = dataPoint;
-    const poiPosition = coordtransform.wgs84togcj02(locationx, locationy); 
-    // const poiPosition = [locationx, locationy]; 
+    // const poiPosition = coordtransform.wgs84togcj02(locationx, locationy); 
+    const poiPosition = [locationx, locationy]; 
     let markerLayer = marker([poiPosition[1], poiPosition[0]]).addTo(markers);
     markerLayer.bindPopup(name);
     markerLayer.openPopup();
