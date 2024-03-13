@@ -5,6 +5,7 @@ export async function getPoi (req, res) {
         const pool_client = await pool.connect();
         const data = await pool_client.query('SELECT * FROM njpoi_2020_new');
         const pointData = convert(data.rows); 
+        // console.log(pointData);
         res.status(200).send(pointData);
     } catch (err) {
         console.error(err);

@@ -8,7 +8,7 @@
         text-color="#fff"
         @open="handleOpen"
         @close="handleClose"
-        :default-openeds= "['1']"
+        :default-openeds= "['2-2']"
         unique-opened
       >
         <el-sub-menu index="1">

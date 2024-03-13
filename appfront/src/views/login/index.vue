@@ -15,8 +15,8 @@
               message: '请输入账号',
               trigger: 'blur'
             }
-          ]" prop="username">
-              <el-input v-model="ruleForm.username" clearable placeholder="账号" autocomplete="new-password" />
+          ]" prop="account">
+              <el-input v-model="ruleForm.account" clearable placeholder="账号" autocomplete="new-password" />
             </el-form-item>
 
 
@@ -47,6 +47,9 @@ import { LocationFilled } from '@element-plus/icons-vue'
 import { loginRules } from "./utils/rule";
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { bg } from "./utils/static.js";
+import { login } from '@/api/api.js';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 defineOptions({
   name: "Login"
 });
@@ -56,16 +59,22 @@ const ruleFormRef = ref();
 
 
 const ruleForm = reactive({
-  username: "",
+  account: "",
   password: ""
 });
 
 const onLogin = async (formEl) => {
   loading.value = true;
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-
+      const { account, password } = ruleForm;
+      console.log(account, password);
+      const res = await login({account, password});
+      console.log(res);
+      loading.value = false;
+      localStorage.setItem('token', res.data.data);
+      router.push({name:'map'})
     } else {
       loading.value = false;
       return fields;

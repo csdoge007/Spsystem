@@ -7,4 +7,5 @@ const config = {
     connectionLimit: 0,
 }
 const pool = new pg.Pool(config);
+export const secretKey = 'csdoge007';
 export default pool;

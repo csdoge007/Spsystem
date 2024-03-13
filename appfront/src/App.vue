@@ -1,12 +1,12 @@
 <script setup>
-import Map from './components/Map.vue';
-import Navigator from './components/Navigator.vue';
-import Login from './views/login/index.vue';
+// import Map from './components/Map.vue';
+// import Navigator from './components/Navigator.vue';
+// import Login from './views/login/index.vue';
 </script>
 
 <template>
   <div class="app">
-    <el-container>
+    <!-- <el-container>
       <el-aside>
         <Navigator></Navigator>
       </el-aside>
@@ -15,15 +15,16 @@ import Login from './views/login/index.vue';
           <Map></Map>
         </el-main>
       </el-container>
-    </el-container>
+    </el-container> -->
     <!-- <Login></Login> -->
+    <router-view></router-view>
   </div>
 </template>
 
 <style scoped>
 .app {
     height: 100%;
-    display: flex;
+    /* display: flex; */
 }
 .el-aside {
   background-color: #242E42;
