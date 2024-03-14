@@ -8,7 +8,7 @@
         text-color="#fff"
         @open="handleOpen"
         @close="handleClose"
-        :default-openeds= "['2-2']"
+        default-active="2-2"
         unique-opened
       >
         <el-sub-menu index="1">
@@ -45,7 +45,6 @@
 
 <script  setup>
 import {
-  Menu as IconMenu,
   Location,
   Edit,
   Setting
