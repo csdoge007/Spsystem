@@ -2,8 +2,6 @@ import express from 'express';
 import cors from './middleware/cors.js';
 import bodyParser from 'body-parser';
 import { getPoi, searchPoi, boxSelectPoi } from './controller/map.js';
-// import expressJWT from 'express-jwt';
-// import { secretKey } from './config.js';
 import authenticateToken from './middleware/jwt.js';
 import { login } from './controller/user.js';
 const app = express();
