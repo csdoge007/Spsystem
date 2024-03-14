@@ -1,7 +1,7 @@
 // import Vue from 'vue'
 import Axios from 'axios'
 
-Axios.defaults.timeout = 5000;
+Axios.defaults.timeout = 10000;
 // const baseURL = 'http://localhost:3000/'
 const axiosInstance = Axios.create({
     withCredentials: true,
