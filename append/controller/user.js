@@ -2,9 +2,10 @@ import pool from "../config.js";
 import { secretKey } from "../config.js";
 import jwt from 'jsonwebtoken';
 import { getUserByAccount } from "../service/user.js";
-export async function login (req, res) {
+export async function login (req, res, next) {
+  let pool_client;
   try {
-    const pool_client = await pool.connect();
+    pool_client = await pool.connect();
     const { account, password } = req.body.userInfo;
     console.log(account, password);
     const userInfo = await getUserByAccount(account);
@@ -42,8 +43,18 @@ export async function login (req, res) {
 
 
   } catch (err) {
+    next(err);
     console.error(err);
     res.send("Error" + err);
+  } finally {
+    // 无论是正常结束还是异常结束，都释放数据库连接
+    if (pool_client) {
+        try {
+            pool_client.release(); // 释放数据库连接
+        } catch (err) {
+            console.error('Error releasing pool client:', err);
+        }
+    }
   }
 };
 
