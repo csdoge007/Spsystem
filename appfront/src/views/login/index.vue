@@ -50,6 +50,7 @@ import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
 defineOptions({
   name: "Login"
 });
@@ -71,10 +72,14 @@ const onLogin = async (formEl) => {
       const { account, password } = ruleForm;
       console.log(account, password);
       const res = await login({account, password});
-      console.log(res);
       loading.value = false;
       localStorage.setItem('token', res.data.data);
-      router.push({name:'map'})
+      router.push({
+        name: 'map',
+        params: {
+          id: account,
+        }
+      });
     } else {
       loading.value = false;
       return fields;
