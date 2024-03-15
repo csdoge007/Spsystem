@@ -32,7 +32,7 @@ export async function login (req, res, next) {
       },
       secretKey,
       {
-        expiresIn: Math.floor(Date.now() / 1000) + (24 * 60 *60),
+        expiresIn: 24 * 60 * 60,
       }
     )
 
