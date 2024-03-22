@@ -75,7 +75,7 @@ const onLogin = async (formEl) => {
       loading.value = false;
       localStorage.setItem('token', res.data.data);
       router.push({
-        name: 'map',
+        name: 'select',
         params: {
           id: account,
         }
