@@ -1,7 +1,7 @@
 <template>
   <div id="map">
     <!-- <Header></Header> -->
-    <el-input v-model="input" placeholder="请输入商业网点名称" @input="searchPosition" />
+    <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
   </div>
 </template>
 
@@ -25,6 +25,9 @@ let baseLayers = {};
 // const searchedLayer = null;
 const input = ref('');
 // const isHidden = ref(true);
+const props = defineProps({
+  isEdit: Boolean,
+});
 const showSearchPoi = (data, wrappedLayer) => {
   map.eachLayer(function (layer) {
     if (layer !== Layer) { // 排除底图
@@ -83,11 +86,11 @@ const addDrawControl = () => {
   let drawControl = new Control.Draw({
     draw: {
       polyline: false,
-      polygon: true,
+      polygon: !props.isEdit,
       rectangle: false,
-      circle: true,
+      circle: !props.isEdit,
       circlemarker: false,
-      marker: false,
+      marker: props.isEdit,
     },
     edit: false,
     remove: false, // 禁用删除

@@ -1,7 +1,7 @@
 <template>
   <div class="select">
     <LeftSlide class="leftslide" :hideLeft="isHidden" @toggleRotation="toggleRotation"></LeftSlide>
-    <Map></Map>
+    <Map :isEdit="false"></Map>
   </div>
 </template>
 
@@ -13,7 +13,6 @@ const isHidden = ref(true);
 const toggleRotation = () => {
   isHidden.value = !isHidden.value;
 };
-
 </script>
 
 <style scoped>

@@ -11,7 +11,7 @@
         default-active="2-2"
         unique-opened
       >
-        <el-menu-item index="1">
+        <el-menu-item index="1" @click="goTo('edit')">
           <template #title>
             <el-icon><Edit /></el-icon>
             <span>企业制图</span>
@@ -23,7 +23,7 @@
             <span>智能选址</span>
           </template>
           <el-menu-item index="2-1">数据管理</el-menu-item>
-          <el-menu-item index="2-2">选址规划</el-menu-item>
+          <el-menu-item index="2-2" @click="goTo('select')">选址规划</el-menu-item>
           <el-menu-item index="2-3">我的收藏</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="3">
@@ -44,14 +44,23 @@ import {
   Location,
   Edit,
   Setting
-} from '@element-plus/icons-vue'
+} from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
 }
 const handleClose = (key, keyPath) => {
   console.log(key, keyPath)
 }
-
+const goTo = (name) => {
+  router.push({
+    name,
+    params: {
+      id: router.currentRoute.value.params.id,
+    }
+  });
+};
 </script>
 <style scoped>
 .name {
