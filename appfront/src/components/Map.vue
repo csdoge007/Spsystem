@@ -1,6 +1,6 @@
 <template>
   <div id="map">
-    <Header></Header>
+    <!-- <Header></Header> -->
     <el-input v-model="input" placeholder="请输入商业网点名称" @input="searchPosition" />
   </div>
 </template>
@@ -14,7 +14,8 @@ import { Map, TileLayer, marker, layerGroup, control, divIcon, Control } from 'l
 import 'leaflet-draw';
 import { onMounted, ref } from 'vue';
 import { svgTypes } from '../assets/svg/svg';
-import Header from './Header.vue';
+// import Header from './Header.vue';
+// import LeftSlide from './LeftSlide.vue';
 import coordtransform from 'coordtransform';
 
 // const map = ref({});
@@ -23,6 +24,7 @@ let Layer = null;
 let baseLayers = {};
 // const searchedLayer = null;
 const input = ref('');
+// const isHidden = ref(true);
 const showSearchPoi = (data, wrappedLayer) => {
   map.eachLayer(function (layer) {
     if (layer !== Layer) { // 排除底图
@@ -121,6 +123,9 @@ const addDrawEvents = async () => {
     }
   });
 };
+// const toggleRotation = () => {
+//   isHidden.value = !isHidden.value;
+// };
 onMounted(() => {
   initMap();
   let poiImport = importPoi();
