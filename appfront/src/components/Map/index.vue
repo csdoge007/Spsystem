@@ -8,15 +8,18 @@
 <script setup>
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
-import { getPoi, searchPoi, boxSelectPoi } from '../api/api';
+import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
 // 引入Leaflet对象 挂载到Vue上，便于全局使用，也可以单独页面中单独引用
 import { Map, TileLayer, marker, layerGroup, control, divIcon, Control } from 'leaflet';
 import 'leaflet-draw';
 import { onMounted, ref } from 'vue';
-import { svgTypes } from '../assets/svg/svg';
+import { svgTypes } from '@/assets/svg/svg';
 // import Header from './Header.vue';
 // import LeftSlide from './LeftSlide.vue';
 import coordtransform from 'coordtransform';
+defineOptions({
+  name: 'Map'
+})
 
 // const map = ref({});
 let map = null;

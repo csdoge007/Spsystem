@@ -15,6 +15,9 @@
 
 <script setup>
 import Navigator from '@/components/Navigator.vue';
+defineOptions({
+  name: 'Admin'
+})
 </script>
 
 <style lang="scss" scoped>

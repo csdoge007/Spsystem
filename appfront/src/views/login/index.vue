@@ -45,7 +45,7 @@
 <script setup>
 import { LocationFilled } from '@element-plus/icons-vue'
 import { loginRules } from "./utils/rule";
-import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
+import { ref, reactive } from "vue";
 import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
@@ -87,20 +87,7 @@ const onLogin = async (formEl) => {
   });
 };
 
-/** 使用公共函数，避免`removeEventListener`失效 */
-function onkeypress({ code }) {
-  if (code === "Enter") {
-    onLogin(ruleFormRef.value);
-  }
-}
 
-onMounted(() => {
-  window.document.addEventListener("keypress", onkeypress);
-});
-
-onBeforeUnmount(() => {
-  window.document.removeEventListener("keypress", onkeypress);
-});
 </script>
 
 <style scoped>

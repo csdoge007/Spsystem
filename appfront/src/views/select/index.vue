@@ -6,9 +6,12 @@
 </template>
 
 <script setup>
-import Map from '@/components/Map.vue';
+import Map from '@/components/Map/index.vue';
 import LeftSlide from '@/components/LeftSlide.vue';
 import { ref } from 'vue';
+defineOptions({
+  name: 'Select'
+})
 const isHidden = ref(true);
 const toggleRotation = () => {
   isHidden.value = !isHidden.value;
