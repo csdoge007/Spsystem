@@ -93,10 +93,10 @@ const onSubmit = async (formEl) => {
   left: 365px;
 }
 .info {
+  width: 600px;
+  height: 140px;
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-100% - 50px));
   z-index: 1000;
   background-color: white;
   padding: 10px;

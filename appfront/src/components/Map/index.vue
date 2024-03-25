@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+import { usePointStore } from '@/stores/point';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
@@ -20,6 +21,7 @@ import coordtransform from 'coordtransform';
 defineOptions({
   name: 'Map'
 })
+const pointStore = usePointStore();
 
 // const map = ref({});
 let map = null;
@@ -121,7 +123,13 @@ const addDrawEvents = async () => {
         }
         const data = await boxSelectPoi(circleGeometry).then(response => response.data);
         showSearchPoi(data, drawedLayer);
-      } else {
+      } else if (e.layerType === 'marker') {
+        const markerLatLng = drawedLayer.getLatLng();
+        const containerPosition = map.latLngToContainerPoint(markerLatLng);
+        console.log(containerPosition);
+        const { x, y } = containerPosition;
+        pointStore.changePosition(x, y);
+      }else {
         await boxSelectPoi(polygonGeoJson.geometry);
       }
     } catch (err) {
@@ -151,7 +159,7 @@ onMounted(() => {
       baseLayers[type] = markersLayer;
     });
     const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: false });
-    controlLayer.addTo(map);
+    if (!props.isEdit) controlLayer.addTo(map);
   });
   addDrawEvents();
 });
