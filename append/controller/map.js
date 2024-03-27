@@ -1,6 +1,7 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
 import { circleSelectPoi } from "../service/map.js";
+import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
   try {
@@ -34,7 +35,7 @@ export async function searchPoi(req, res, next) {
       return;
     }
     pool_client = await pool.connect();
-    const result = await pool_client.query(`SELECT * FROM njpoi_2020_new WHERE name ILIKE '%' || $1 || '%'`, [query]);
+    const result = await pool_client.query(`SELECT * FROM poppoi_nj WHERE name ILIKE '%' || $1 || '%'`, [query]);
     res.status(200).send(result.rows);
   } catch (err) {
     next(err);
@@ -56,7 +57,9 @@ export async function boxSelectPoi(req, res, next) {
     const { polygon } = req.body;
     if (polygon.type === 'circle') {
       const { radius, coordinates: [lng, lat] } = polygon;
+      // const result = await circleSelectPoi([lng, lat], 'poppoi_nj', radius);
       const result = await circleSelectPoi([lng, lat], 'njpoi_2020_new', radius);
+      
       res.status(200).send(result.rows);
     }
   } catch (err) {
@@ -70,7 +73,7 @@ export async function getAccessibility(req, res, next) {
   let pool_client;
   try {
     pool_client = await pool.connect();
-    const { x, y, radius } = req.query;
+    const { radius, layer } = req.query;
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer)
       RETURNS double precision AS
@@ -81,9 +84,9 @@ export async function getAccessibility(req, res, next) {
         poi_count integer; 
       BEGIN 
         FOR poi_rec IN SELECT *
-            FROM poppoi_nj
+            FROM poppoi_nj_new
             WHERE ST_DWithin(
-              poppoi_nj.geom::geography, 
+              poppoi_nj_new.geom::geography, 
               ST_SetSRID(ST_MakePoint(x_val, y_val), 4326)::geography, 
               radius_val
             ) LOOP 
@@ -106,26 +109,69 @@ export async function getAccessibility(req, res, next) {
         console.error('Error executing SQL:', err);
         return;
       }
-    
       // 创建函数成功
       console.log('Function created successfully');
     });
-    pool_client.query(`SELECT calculate_sum($1, $2, $3) AS result_sum;`, [x, y, radius], (err, result) => {
-      if (err) {
-        console.error('Error executing SQL:', err);
-        return;
-      }
-
-      // 从查询结果中获取 result_sum 的值
-      const result_sum = result.rows[0].result_sum;
-
-      // 输出 result_sum
-      console.log('Result sum:', result_sum);
-      res.status(200).send({accessibility:result_sum});
+    // 查询layer名为layer的点
+    const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1', [layer]);
+    const points = resultPoints.rows;
+    const reachabilityQueries = points.map(point => {
+      const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
+      return pool_client.query(`SELECT calculate_sum($1, $2, $3) AS result_sum;`, [ wgs84[0],  wgs84[1], radius]);
     });
+    
+    const results = await Promise.all(reachabilityQueries);
+    const resultSums = results.map((result, idx) => {
+      return {
+        resultSums: result.rows[0].result_sum,
+        name: points[idx].title,
+        x: points[idx].locationx,
+        y: points[idx].locationy,
+      }
+    });
+    resultSums.sort((a, b) => b.resultSums - a.resultSums);
+    console.log(resultSums);
+    res.status(200).send({accessibility:resultSums});
+  
     // res.status(200).send(mallPois.rows);
   } catch (err) {
     console.error(err);
+  } finally {
+    // 无论是正常结束还是异常结束，都释放数据库连接
+    if (pool_client) {
+      try {
+        pool_client.release(); // 释放数据库连接
+      } catch (err) {
+        console.error('Error releasing pool client:', err);
+      }
+    }
   }
 
-}
+};
+
+
+export async function addPoint(req, res, next) {
+  let pool_client;
+  try {
+    const { pointInfo } = req.body;
+    console.log(pointInfo);
+    const { layer, title, description, address, x, y } = pointInfo;
+    pool_client = await pool.connect();
+    const sql = 'INSERT INTO point (title, layer, locationx, locationy, description, address) VALUES ($1, $2, $3, $4, $5, $6)';
+    await pool_client.query(sql, [title, layer, x, y, description, address]);
+    res.status(200).send();
+  } catch (err) {
+    next(err);
+    console.error(err);
+    res.send("Error" + err);
+  } finally {
+    // 无论是正常结束还是异常结束，都释放数据库连接
+    if (pool_client) {
+      try {
+        pool_client.release(); // 释放数据库连接
+      } catch (err) {
+        console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+};
