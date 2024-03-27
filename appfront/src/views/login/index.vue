@@ -6,9 +6,7 @@
         <el-icon size="75"><LocationFilled /></el-icon>
         <h2 class="outline-none">商选易达</h2>
         <div class="login-form">
-
           <el-form ref="ruleFormRef" :model="ruleForm" :rules="loginRules" size="large">
-
             <el-form-item :rules="[
             {
               required: true,
@@ -18,24 +16,15 @@
           ]" prop="account">
               <el-input v-model="ruleForm.account" clearable placeholder="账号" autocomplete="new-password" />
             </el-form-item>
-
-
-
             <el-form-item prop="password">
               <el-input v-model="ruleForm.password" clearable show-password placeholder="密码"
                 autocomplete="new-password" />
             </el-form-item>
-
-
-
             <el-button class="w-full mt-4" size="default" type="primary" :loading="loading"
               @click="onLogin(ruleFormRef)">
               登录
             </el-button>
-
           </el-form>
-
-
         </div>
       </div>
     </div>
@@ -50,20 +39,15 @@ import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-
 defineOptions({
   name: "Login"
 });
-
 const loading = ref(false);
 const ruleFormRef = ref();
-
-
 const ruleForm = reactive({
   account: "",
   password: ""
 });
-
 const onLogin = async (formEl) => {
   loading.value = true;
   if (!formEl) return;

@@ -1,6 +1,5 @@
 <template>
   <div id="map">
-    <!-- <Header></Header> -->
     <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
   </div>
 </template>
@@ -10,26 +9,19 @@ import { usePointStore } from '@/stores/point';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
-// 引入Leaflet对象 挂载到Vue上，便于全局使用，也可以单独页面中单独引用
 import { Map, TileLayer, marker, layerGroup, control, divIcon, Control } from 'leaflet';
 import 'leaflet-draw';
 import { onMounted, ref } from 'vue';
 import { svgTypes } from '@/assets/svg/svg';
-// import Header from './Header.vue';
-// import LeftSlide from './LeftSlide.vue';
 import coordtransform from 'coordtransform';
 defineOptions({
   name: 'Map'
 })
 const pointStore = usePointStore();
-
-// const map = ref({});
 let map = null;
 let Layer = null;
 let baseLayers = {};
-// const searchedLayer = null;
 const input = ref('');
-// const isHidden = ref(true);
 const props = defineProps({
   isEdit: Boolean,
 });
@@ -45,6 +37,9 @@ const showSearchPoi = (data, wrappedLayer) => {
   data.forEach(dataPoint => {
     const { locationx, locationy, name } = dataPoint;
     // const poiPosition = coordtransform.wgs84togcj02(locationx, locationy); 
+    
+    // const poiPosition = coordtransform.gcj02towgs84(locationx, locationy); 
+
     const poiPosition = [locationx, locationy]; 
     let markerLayer = marker([poiPosition[1], poiPosition[0]]).addTo(markers);
     markerLayer.bindPopup(name);
@@ -76,16 +71,26 @@ const initMap = () => {
     map.setView([32.1141, 118.93198], 11)
     map.attributionControl.remove();
     map.zoomControl.setPosition('bottomright');
+    pointStore.setMap(map);
     addDrawControl();
   }
 }
-const importPoi = () => {
-  return getPoi().then(response => {
-    return response.data;
-  }).catch(err => {
-    console.error(err);
+const buildLayerTree = (data) => {
+  Object.keys(data).forEach((type) => {
+    const markersLayer = layerGroup();
+    data[type].forEach((point) => {
+      const { locationy, locationx } = point;
+      let svgIcon = divIcon({
+        className: 'custom-svg-icon',
+        html: svgTypes[type],
+      });
+      marker([locationy, locationx], { icon: svgIcon }).addTo(markersLayer).bindPopup(point.name).openPopup();
+    })
+    baseLayers[type] = markersLayer;
   });
-};
+  const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: false });
+  controlLayer.addTo(map);
+}
 
 const addDrawControl = () => {
   let drawControl = new Control.Draw({
@@ -115,7 +120,6 @@ const addDrawEvents = async () => {
         const { radius } = drawedLayer.options;
         const coordinates = coordtransform.gcj02towgs84(circleCenter.lng, circleCenter.lat);
         // const coordinates = [circleCenter.lng, circleCenter.lat];
-        console.log(circleCenter);
         const circleGeometry = {
           type: 'circle',
           coordinates,
@@ -124,12 +128,21 @@ const addDrawEvents = async () => {
         const data = await boxSelectPoi(circleGeometry).then(response => response.data);
         showSearchPoi(data, drawedLayer);
       } else if (e.layerType === 'marker') {
+        pointStore.setEditingPoint(drawedLayer);
         const markerLatLng = drawedLayer.getLatLng();
+        const { lng, lat } = markerLatLng;
         const containerPosition = map.latLngToContainerPoint(markerLatLng);
-        console.log(containerPosition);
         const { x, y } = containerPosition;
         pointStore.changePosition(x, y);
-      }else {
+        pointStore.changeLocation(lng, lat);
+        map.panTo([lat, lng]);
+        map.on('move', function() {
+          if (!pointStore.editing) return;
+          const containerPosition = map.latLngToContainerPoint(markerLatLng);
+          const { x, y } = containerPosition;
+          pointStore.changePosition(x, y);
+        });
+      } else {
         await boxSelectPoi(polygonGeoJson.geometry);
       }
     } catch (err) {
@@ -137,31 +150,15 @@ const addDrawEvents = async () => {
     }
   });
 };
-// const toggleRotation = () => {
-//   isHidden.value = !isHidden.value;
-// };
-onMounted(() => {
+onMounted(async () => {
   initMap();
-  let poiImport = importPoi();
-  let initBaseLayer = poiImport.then(data => {
-    console.log(Object.keys(data));
-    Object.keys(data).forEach((type) => {
-      const markersLayer = layerGroup();
-      data[type].forEach((point) => {
-        const { locationy, locationx } = point;
-        let svgIcon = divIcon({
-          className: 'custom-svg-icon',
-          html: svgTypes[type],
-        });
-        marker([locationy, locationx], { icon: svgIcon }).addTo(markersLayer).bindPopup(point.name).openPopup();
-
-      })
-      baseLayers[type] = markersLayer;
-    });
-    const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: false });
-    if (!props.isEdit) controlLayer.addTo(map);
-  });
-  addDrawEvents();
+  try {
+    const { data } = await getPoi();
+    buildLayerTree(data);
+    addDrawEvents();
+  } catch (err) {
+    console.error(err);
+  }
 });
 </script>
 

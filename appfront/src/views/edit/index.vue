@@ -1,6 +1,6 @@
 <template>
   <div class="edit">
-    <InfoSubmission :layers="layers" v-if="!hidden" ref="infoSubmission"></InfoSubmission>
+    <InfoSubmission :layers="layers" v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
     <Map :isEdit="true"></Map>
   </div>
 
@@ -8,16 +8,14 @@
 
 <script setup>
 import { usePointStore } from '@/stores/point';
-import { onMounted, ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import InfoSubmission from '@/components/InfoSubmission/index.vue';
 import Map from '@/components/Map/index.vue';
 defineOptions({
   name: 'Edit'
 })
 const layers = ref([
-      { label: '选项1', value: 'option1' },
-      { label: '选项2', value: 'option2' },
-      { label: '选项3', value: 'option3' },
+      { label: '图层0', value: 'layer0' },
     ]); // 选项数组
 const pointStore = usePointStore();
 const hidden = ref(true);
@@ -39,7 +37,7 @@ watch(() => pointStore.position, (position) => {
     hidden.value = true;
   }
 })
-
+const hide = () => hidden.value = true;
 </script>
 
 <style scoped>

@@ -20,7 +20,7 @@
         </el-form-item>
       </el-col>
     </el-row>
-
+    
     <el-row>
       <el-col :span="12">
         <el-form-item label="描述">
@@ -35,7 +35,7 @@
     </el-row>
 
     <el-form-item class="flex-container">
-      <el-button>取消</el-button>
+      <el-button @click="onCancel">取消</el-button>
       <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
     </el-form-item>
   </el-form>
@@ -43,7 +43,11 @@
 </template>
 
 <script setup>
+import { usePointStore } from '@/stores/point';
 import { reactive, ref, watch } from 'vue';
+import { pointInfoSub } from '@/api/api';
+const emit = defineEmits(['hide']);
+const pointStore = usePointStore();
 defineOptions({
   name: 'InfoSubmission'
 })
@@ -61,7 +65,7 @@ const rules = reactive({
     { required: true, message: '网点名称不能为空', trigger: 'blur' },
   ]
 })
-const selectedOption = ref(null);
+
 
 
 const form = reactive({
@@ -69,7 +73,7 @@ const form = reactive({
   title: '',
   description: '',
   address: '',
-})
+});
 watch(() => props.options, () => {
   form.layer = props.options
 }, {
@@ -78,13 +82,21 @@ watch(() => props.options, () => {
 
 const onSubmit = async (formEl) => {
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      console.log('submit!');
+      const { locationx, locationy } = pointStore.location;
+      await pointInfoSub({...form, x: locationx, y: locationy });
+      emit('hide');
+      pointStore.edited();
     } else {
       console.log('error submit!', fields)
     }
   })
+}
+const onCancel = () => {
+  pointStore.clearEditingPoint();
+  emit('hide');
 }
 </script>
 <style scoped>

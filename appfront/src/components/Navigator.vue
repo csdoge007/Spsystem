@@ -8,7 +8,7 @@
         text-color="#fff"
         @open="handleOpen"
         @close="handleClose"
-        default-active="2-2"
+        :default-active="active"
         unique-opened
       >
         <el-menu-item index="1" @click="goTo('edit')">
@@ -39,13 +39,15 @@
   </el-row>
 </template>
 
-<script  setup>
+<script setup>
 import {
   Location,
   Edit,
   Setting
 } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+const active = ref('2-2');
 const router = useRouter();
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
@@ -61,6 +63,14 @@ const goTo = (name) => {
     }
   });
 };
+watch(active, (newValue) => {
+  router.push({
+    name: 'select',
+    params: {
+      id: router.currentRoute.value.params.id,
+    }
+  });
+}, { immediate: true })
 </script>
 <style scoped>
 .name {
