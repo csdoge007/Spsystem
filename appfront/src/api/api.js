@@ -26,3 +26,10 @@ export const login = (userInfo) => axios.post('http://localhost:3000/login', {
 export const pointInfoSub = (pointInfo) => axios.post('http://localhost:3000/addPoint' ,{
   pointInfo
 });
+
+export const getAccessibility = (selectInfo) => axios.get('http://localhost:3000/getAccessibility', {
+  params: {
+    ...selectInfo
+  }
+});
+

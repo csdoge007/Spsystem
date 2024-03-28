@@ -1,21 +1,34 @@
 <template>
   <div class="select">
-    <LeftSlide class="leftslide" :hideLeft="isHidden" @toggleRotation="toggleRotation"></LeftSlide>
-    <Map :isEdit="false"></Map>
+    <LeftSlide class="leftslide" :hideLeft="isHidden" @toggleRotation="toggleRotation">
+      <SelectPanel></SelectPanel>
+    </LeftSlide>
+    <div class="map-form">
+      <Map :isEdit="false"></Map>
+      <SelectForm :layers="layers" @toLeft="toLeft"></SelectForm>
+    </div>
   </div>
 </template>
 
 <script setup>
 import Map from '@/components/Map/index.vue';
 import LeftSlide from '@/components/LeftSlide.vue';
+import SelectForm from '@/components/SelectForm/index.vue';
+import SelectPanel from '@/components/SelectPanel/index.vue';
 import { ref } from 'vue';
 defineOptions({
   name: 'Select'
 })
+const layers = ref([
+      { label: '图层0', value: 'layer0' },
+    ]);
 const isHidden = ref(true);
 const toggleRotation = () => {
   isHidden.value = !isHidden.value;
 };
+const toLeft = () => {
+  isHidden.value = false;
+}
 </script>
 
 <style scoped>
@@ -25,5 +38,9 @@ const toggleRotation = () => {
   height: 100%;
   margin: 0;
 }
-
+.map-form {
+  position: relative;
+  height: 100%;
+  width:100%;
+}
 </style>

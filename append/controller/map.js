@@ -74,6 +74,7 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer } = req.query;
+    console.log(radius, layer, 'ss');
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer)
       RETURNS double precision AS
@@ -123,7 +124,7 @@ export async function getAccessibility(req, res, next) {
     const results = await Promise.all(reachabilityQueries);
     const resultSums = results.map((result, idx) => {
       return {
-        resultSums: result.rows[0].result_sum,
+        resultSums: result.rows[0].result_sum.toFixed(2),
         name: points[idx].title,
         x: points[idx].locationx,
         y: points[idx].locationy,
@@ -136,6 +137,7 @@ export async function getAccessibility(req, res, next) {
     // res.status(200).send(mallPois.rows);
   } catch (err) {
     console.error(err);
+    next(err);
   } finally {
     // 无论是正常结束还是异常结束，都释放数据库连接
     if (pool_client) {

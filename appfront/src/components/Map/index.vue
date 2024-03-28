@@ -128,6 +128,9 @@ const addDrawEvents = async () => {
         const data = await boxSelectPoi(circleGeometry).then(response => response.data);
         showSearchPoi(data, drawedLayer);
       } else if (e.layerType === 'marker') {
+        if (pointStore.editing) {
+          pointStore.clearEditingPoint();
+        }
         pointStore.setEditingPoint(drawedLayer);
         const markerLatLng = drawedLayer.getLatLng();
         const { lng, lat } = markerLatLng;

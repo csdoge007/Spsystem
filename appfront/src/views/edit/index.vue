@@ -23,7 +23,6 @@ const infoSubmission = ref(null);
 // const position = computed(() => store.position);
 watch(() => pointStore.position, (position) => {
   const { x, y } = position;
-  console.log(x, y);
   if (x !== 0 || y !== 0) {
     hidden.value = false;
     nextTick(() => {
