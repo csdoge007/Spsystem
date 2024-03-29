@@ -34,7 +34,7 @@ const selectStore = useSelectStore();
 </script>
 
 <style scoped>
-::v-deep .el-collapse-item__header {
+:deep(.el-collapse-item__header) {
     height: 100px;
 }
 .collapse {
