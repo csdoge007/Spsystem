@@ -14,8 +14,8 @@ const newData = data.map(item => {
     
     return {
         ...item,
-        x: wgs84[0], // 更新经度
-        y: wgs84[1]  // 更新纬度
+        locationx: wgs84[0], // 更新经度
+        locationy: wgs84[1]  // 更新纬度
     };
 });
 

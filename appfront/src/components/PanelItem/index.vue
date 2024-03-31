@@ -62,34 +62,29 @@ const props = defineProps({
 }
 
 .accessibility {
-  flex: 2;
-  /* display: flex; */
-  position: relative;
+  display: flex;
   flex-direction: column;
+  padding: 15px;
+  position: relative;
+  top: 10px;
 }
 .icon {
   position: relative;
   top: 5px;
 }
 .accessibility-value {
-  /* flex: 2; */
   color: red;
   font-weight: bold;
   font-size: 20px;
+  height: 40px;
 }
 .accessibility-text {
-  /* flex: 1; */
   height: 25px;
   width: 100px;
-  position: absolute;
-
   display: flex;
-  left: -10px;
-  top: 40px;
   font-size: 5px;
   color: black;
   background-color: rgb(247,247,247); 
-  /* text-align: center; */
   align-items: center;
   justify-content: center;
 }

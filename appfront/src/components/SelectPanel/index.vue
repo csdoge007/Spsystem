@@ -2,14 +2,6 @@
   <div class="collapse">
     <h1>选址评估结果如下</h1>
     <el-collapse>
-      <!-- <el-collapse-item title="Consistency" name="1">
-        <template #title>
-          <div>
-            <h1>1</h1>
-          </div>
-        </template>
-      </el-collapse-item> -->
-
       <el-collapse-item v-for="(point, idx) in selectStore.selectedPoints" :key="idx" :name="point.name">
         <template #title>
           <PanelItem 

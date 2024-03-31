@@ -35,7 +35,7 @@ export async function searchPoi(req, res, next) {
       return;
     }
     pool_client = await pool.connect();
-    const result = await pool_client.query(`SELECT * FROM poppoi_nj WHERE name ILIKE '%' || $1 || '%'`, [query]);
+    const result = await pool_client.query(`SELECT * FROM njpoi_2020_new WHERE name ILIKE '%' || $1 || '%'`, [query]);
     res.status(200).send(result.rows);
   } catch (err) {
     next(err);
@@ -74,7 +74,6 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer } = req.query;
-    console.log(radius, layer, 'ss');
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer)
       RETURNS double precision AS
@@ -85,9 +84,9 @@ export async function getAccessibility(req, res, next) {
         poi_count integer; 
       BEGIN 
         FOR poi_rec IN SELECT *
-            FROM poppoi_nj_new
+            FROM poppoi_nj_wgs
             WHERE ST_DWithin(
-              poppoi_nj_new.geom::geography, 
+              poppoi_nj_wgs.geom::geography, 
               ST_SetSRID(ST_MakePoint(x_val, y_val), 4326)::geography, 
               radius_val
             ) LOOP 

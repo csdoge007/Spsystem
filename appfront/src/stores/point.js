@@ -27,5 +27,5 @@ export const usePointStore = defineStore('point', () =>{
   function setMap(mp) {
     map.value = mp;
   }
-  return { editing, edited, position, location, changePosition, changeLocation, editingPoint, clearEditingPoint, setEditingPoint, map, setMap };
+  return { editing, edited, position, location, changePosition, changeLocation, clearEditingPoint, setEditingPoint, map, setMap };
 })
