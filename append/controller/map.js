@@ -73,9 +73,17 @@ export async function getAccessibility(req, res, next) {
   let pool_client;
   try {
     pool_client = await pool.connect();
-    const { radius, layer } = req.query;
+    const { radius, layer, type } = req.query;
+    const indexQuery = `CREATE INDEX idx_type ON njpoi_2020_new (type);`;
+    pool_client.query(indexQuery, (err, result) => {
+      if (err) {
+        console.error('Error creating index', err);
+        return;
+      }
+      console.log('Index created successfully');
+    })
     const createFunctionQuery = `
-      CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer)
+      CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS
       $$ 
       DECLARE 
@@ -92,7 +100,8 @@ export async function getAccessibility(req, res, next) {
             ) LOOP 
           SELECT COUNT(*) INTO poi_count 
           FROM njpoi_2020_new 
-          WHERE ST_DWithin(njpoi_2020_new.geom, poi_rec.geom, radius_val); 
+          WHERE ST_DWithin(njpoi_2020_new.geom::geography, poi_rec.geom::geography, radius_val)
+          AND substring(type FROM '([^;]+)') = poitype_val;
           IF poi_count > 0 THEN 
             sum := sum + 1.0 / poi_count; 
           END IF; 
@@ -117,7 +126,7 @@ export async function getAccessibility(req, res, next) {
     const points = resultPoints.rows;
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
-      return pool_client.query(`SELECT calculate_sum($1, $2, $3) AS result_sum;`, [ wgs84[0],  wgs84[1], radius]);
+      return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], radius, type]);
     });
     
     const results = await Promise.all(reachabilityQueries);
@@ -149,7 +158,6 @@ export async function getAccessibility(req, res, next) {
   }
 
 };
-
 
 export async function addPoint(req, res, next) {
   let pool_client;

@@ -5,7 +5,7 @@
     </LeftSlide>
     <div class="map-form">
       <Map :isEdit="false"></Map>
-      <SelectForm :layers="layers" @toLeft="toLeft"></SelectForm>
+      <SelectForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }"></SelectForm>
     </div>
   </div>
 </template>
@@ -42,5 +42,10 @@ const toLeft = () => {
   position: relative;
   height: 100%;
   width:100%;
+}
+.left {
+  position: absolute;
+  left: 40px;
+  transform: translate(0,-50%);
 }
 </style>

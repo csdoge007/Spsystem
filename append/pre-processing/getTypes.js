@@ -6,4 +6,4 @@ export default async function getTypes() {
     AS store_type FROM njpoi_2020`);
     const arrTypes = data.rows.map((item) => item.store_type);
     update('../data/store_types.json', JSON.stringify(arrTypes));
-};
+};  
