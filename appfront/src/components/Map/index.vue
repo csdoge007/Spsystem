@@ -1,6 +1,7 @@
 <template>
   <div id="map">
     <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
+    <Popup :name="popupName" ref="popup" v-if="isPopuped" @close="closePopup"></Popup>
   </div>
 </template>
 
@@ -9,19 +10,52 @@ import { usePointStore } from '@/stores/point';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
-import { Map, TileLayer, marker, layerGroup, control, divIcon, Control } from 'leaflet';
+import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds } from 'leaflet';
 import 'leaflet-draw';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue';
 import { svgTypes } from '@/assets/svg/svg';
 import coordtransform from 'coordtransform';
+import { useSelectStore } from '@/stores/select';
+import Popup from '@/components/Popup/index.vue';
 defineOptions({
   name: 'Map'
 })
+const popupName = ref('');
+const selectStore = useSelectStore();
 const pointStore = usePointStore();
 let map = null;
 let Layer = null;
 let baseLayers = {};
+const popup = ref(null);
+const isPopuped = ref(false);
+const closePopup = () => {
+  isPopuped.value = false;
+}
+watch(() => selectStore.selectedPoints, (newPoints) => {
+
+  if (baseLayers['selectedLayer']) {
+    map.removeLayer(baseLayers['selectedLayer']);
+    baseLayers['selectedLayer'] = null;
+  }
+
+  const markers = layerGroup();
+  baseLayers['selectedLayer'] = markers;
+  for (let i = 0; i < 3 && i < newPoints.length; i++) {
+    let svgIcon = divIcon({
+      className: 'custom-svg-icon',
+      html: svgTypes[i],
+    });
+    const { x, y, name } = newPoints[i]; 
+    console.log(x, y, name, 'zz');
+    let markerLayer = marker([y, x], { icon: svgIcon, name: name, type: 'rank' }).addTo(markers);
+    console.log('markerLayer', markerLayer);
+    if (i === 0) map.panTo([y, x]);
+  }
+  map.addLayer(markers);
+  
+});
 const input = ref('');
+// console.log('input', input);
 const props = defineProps({
   isEdit: Boolean,
 });
@@ -84,14 +118,71 @@ const buildLayerTree = (data) => {
         className: 'custom-svg-icon',
         html: svgTypes[type],
       });
-      marker([locationy, locationx], { icon: svgIcon }).addTo(markersLayer).bindPopup(point.name).openPopup();
+      marker([locationy, locationx], { icon: svgIcon, name: point.name, type: 'normal' }).addTo(markersLayer);
     })
     baseLayers[type] = markersLayer;
   });
-  const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: false });
+  const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: true });
   controlLayer.addTo(map);
 }
+let pointLatLng;
+let pointType;
+const movePopupEvent = () => {
+  if (!isPopuped.value) return;
+  console.log('move');
+  const containerPosition = map.latLngToContainerPoint(pointLatLng);
+  const { x, y } = containerPosition;
+  nextTick(() => {
+    const infoEl = popup.value.$el;
+    if (infoEl) {
+      infoEl.style.left = `${x + (pointType === 'rank' ? 20 : 3)}px`;
+      infoEl.style.top = `${y}px`;
+    }
+  });
+}
+const addPopupEvents = () => {
+  map.on('click', function(event) {
+    if (pointStore.editing) {
+      return;
+    }
+    let clickedPoint = event.layerPoint; 
+    console.log('click', clickedPoint);
 
+    // 遍历所有标记点
+    map.eachLayer(function(layer) {
+      if (layer instanceof Marker) {
+        // console.log('sss');
+        // 获取标记点的图标大小
+        let iconSize = layer.options.icon.options.iconSize;
+        // 获取标记点在地图上的像素坐标
+        let markerPoint = map.latLngToLayerPoint(layer.getLatLng());
+        // 计算标记点的包围盒范围
+        let markerBounds = bounds(markerPoint, markerPoint.add([40, 40]));
+
+        // 判断点击的点是否在标记点的包围盒范围内
+        if (markerBounds.contains(clickedPoint)) {
+          console.log('iconSize', iconSize);
+          // 如果点击的点在标记点的范围内，则认为点击到了标记点
+          console.log('click-marker', layer.options.name);
+          isPopuped.value = true;
+          popupName.value = layer.options.name;
+          pointLatLng = layer.getLatLng();
+          pointType = layer.options.type;
+          const containerPosition = map.latLngToContainerPoint(pointLatLng);
+          const { x, y } = containerPosition;
+          nextTick(() => {
+            const infoEl = popup.value.$el;
+            if (infoEl) {
+              infoEl.style.left = `${x + (pointType === 'rank' ? 20 : 3)}px`;
+              infoEl.style.top = `${y}px`;
+            }
+          });
+        }
+      }
+    });
+  });
+  map.on('move', movePopupEvent);
+};
 const addDrawControl = () => {
   let drawControl = new Control.Draw({
     draw: {
@@ -108,6 +199,13 @@ const addDrawControl = () => {
   console.log(drawControl);
   map.addControl(drawControl);
 };
+const moveEditEvent = ()=> {
+  if (!pointStore.editing) return;
+  const containerPosition = map.latLngToContainerPoint(markerLatLng);
+  const { x, y } = containerPosition;
+  pointStore.changePosition(x, y);
+}
+let markerLatLng;
 const addDrawEvents = async () => {
   map.on(L.Draw.Event.CREATED, async function (e) {
     let drawedLayer = e.layer;
@@ -129,22 +227,18 @@ const addDrawEvents = async () => {
         showSearchPoi(data, drawedLayer);
       } else if (e.layerType === 'marker') {
         if (pointStore.editing) {
+          console.log('editing', pointStore.editing);
           pointStore.clearEditingPoint();
         }
         pointStore.setEditingPoint(drawedLayer);
-        const markerLatLng = drawedLayer.getLatLng();
+        markerLatLng = drawedLayer.getLatLng();
         const { lng, lat } = markerLatLng;
         const containerPosition = map.latLngToContainerPoint(markerLatLng);
         const { x, y } = containerPosition;
         pointStore.changePosition(x, y);
         pointStore.changeLocation(lng, lat);
         map.panTo([lat, lng]);
-        map.on('move', function() {
-          if (!pointStore.editing) return;
-          const containerPosition = map.latLngToContainerPoint(markerLatLng);
-          const { x, y } = containerPosition;
-          pointStore.changePosition(x, y);
-        });
+        map.on('move', moveEditEvent);
       } else {
         await boxSelectPoi(polygonGeoJson.geometry);
       }
@@ -159,9 +253,14 @@ onMounted(async () => {
     const { data } = await getPoi();
     buildLayerTree(data);
     addDrawEvents();
+    addPopupEvents();
   } catch (err) {
     console.error(err);
   }
+});
+onBeforeUnmount(() => {
+  map.off('move', moveEditEvent);
+  map.off('move', movePopupEvent);
 });
 </script>
 

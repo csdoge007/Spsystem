@@ -1,8 +1,8 @@
 <template>
   <div class="collapse">
     <h1>选址评估结果如下</h1>
-    <el-collapse>
-      <el-collapse-item v-for="(point, idx) in selectStore.selectedPoints" :key="idx" :name="point.name">
+    <el-collapse accordion @change="changeActiveItem">
+      <el-collapse-item v-for="(point, idx) in selectStore.selectedPoints" :key="idx" :name="idx">
         <template #title>
           <PanelItem 
             :rank="idx + 1" 
@@ -22,7 +22,10 @@ defineOptions({
   name: 'SelectPanel',
 })
 const selectStore = useSelectStore();
-
+const changeActiveItem = (activeItemIndex) => {
+  if (!activeItemIndex && activeItemIndex !== 0) return;
+  selectStore.panToActivePoint(activeItemIndex);
+}
 </script>
 
 <style scoped>

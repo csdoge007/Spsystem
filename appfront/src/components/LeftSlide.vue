@@ -28,7 +28,6 @@ const toggleRotation = () => {
 .leftSlide {
   position: relative;
   height: 100%;
-  /* background-color: black; */
   transition: width 0.3s ease;
   overflow: hidden;
 }
