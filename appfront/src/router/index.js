@@ -29,5 +29,19 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes, 
 })
-
+router.beforeEach((to, from, next) => {
+  if (to.path === '/') {
+    localStorage.removeItem('token');
+    next();
+  } else {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      next({
+        path: '/',
+      })
+    } else {
+      next();
+    }
+  }
+})
 export default router;

@@ -18,7 +18,8 @@
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="ruleForm.password" clearable show-password placeholder="密码"
-                autocomplete="new-password" />
+                autocomplete="new-password" @focus="clearError"/>
+              <span v-if="showError" style="color: red;">密码错误，请重新输入</span>
             </el-form-item>
             <el-button class="w-full mt-4" size="default" type="primary" :loading="loading"
               @click="onLogin(ruleFormRef)">
@@ -39,6 +40,7 @@ import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+const showError = ref(false);
 defineOptions({
   name: "Login"
 });
@@ -48,6 +50,9 @@ const ruleForm = reactive({
   account: "",
   password: ""
 });
+const clearError = () => {
+  showError.value = false;
+};
 const onLogin = async (formEl) => {
   loading.value = true;
   if (!formEl) return;
@@ -55,15 +60,20 @@ const onLogin = async (formEl) => {
     if (valid) {
       const { account, password } = ruleForm;
       console.log(account, password);
-      const res = await login({account, password});
-      loading.value = false;
-      localStorage.setItem('token', res.data.data);
-      router.push({
-        name: 'select',
-        params: {
-          id: account,
-        }
-      });
+      try {
+        const res = await login({account, password});
+        loading.value = false;
+        localStorage.setItem('token', res.data.data);
+        router.push({
+          name: 'select',
+          params: {
+            id: account,
+          }
+        });
+      } catch (error) {
+        loading.value = false;
+        showError.value = true;
+      }
     } else {
       loading.value = false;
       return fields;

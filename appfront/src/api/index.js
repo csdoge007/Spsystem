@@ -35,6 +35,7 @@ axiosInstance.interceptors.response.use(
     // 对响应错误进行处理
     if (error.response && error.response.status === 401) {
       // 如果接口返回 401 Unauthorized 错误，说明 token 过期，重定向到登录页面
+      localStorage.setItem('token', null);
       router.push('/');
     }
     return Promise.reject(error);
