@@ -7,6 +7,7 @@
 
 <script setup>
 import { usePointStore } from '@/stores/point';
+import { storeToRefs } from 'pinia';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
@@ -20,17 +21,16 @@ import Popup from '@/components/Popup/index.vue';
 defineOptions({
   name: 'Map'
 })
-const popupName = ref('');
+// const popupName = ref('');
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
+const { pointLatLng, isPopuped, popupName, pointType } = storeToRefs(selectStore);
+const { openPopup, closePopup, changePointLatLng, changePopupName, changePointType } = selectStore;
 let map = null;
 let Layer = null;
 let baseLayers = {};
 const popup = ref(null);
-const isPopuped = ref(false);
-const closePopup = () => {
-  isPopuped.value = false;
-}
+// const isPopuped = ref(false);
 watch(() => selectStore.selectedPoints, (newPoints) => {
 
   if (baseLayers['selectedLayer']) {
@@ -125,21 +125,27 @@ const buildLayerTree = (data) => {
   const controlLayer = control.layers({ '底图': Layer }, baseLayers, { collapsed: true });
   controlLayer.addTo(map);
 }
-let pointLatLng;
-let pointType;
-const movePopupEvent = () => {
-  if (!isPopuped.value) return;
-  console.log('move');
-  const containerPosition = map.latLngToContainerPoint(pointLatLng);
+
+
+const showPopup = () => {
+  const containerPosition = map.latLngToContainerPoint(pointLatLng.value);
   const { x, y } = containerPosition;
   nextTick(() => {
     const infoEl = popup.value.$el;
     if (infoEl) {
-      infoEl.style.left = `${x + (pointType === 'rank' ? 20 : 3)}px`;
+      infoEl.style.left = `${x + (pointType.value === 'rank' ? 20 : 3)}px`;
       infoEl.style.top = `${y}px`;
     }
   });
 }
+const movePopupEvent = () => {
+  if (!isPopuped.value) return;
+  console.log('move');
+  showPopup();
+}
+watch(pointLatLng, () => {
+  showPopup();
+});
 const addPopupEvents = () => {
   map.on('click', function(event) {
     if (pointStore.editing) {
@@ -164,19 +170,13 @@ const addPopupEvents = () => {
           console.log('iconSize', iconSize);
           // 如果点击的点在标记点的范围内，则认为点击到了标记点
           console.log('click-marker', layer.options.name);
-          isPopuped.value = true;
+          openPopup();
           popupName.value = layer.options.name;
-          pointLatLng = layer.getLatLng();
-          pointType = layer.options.type;
-          const containerPosition = map.latLngToContainerPoint(pointLatLng);
-          const { x, y } = containerPosition;
-          nextTick(() => {
-            const infoEl = popup.value.$el;
-            if (infoEl) {
-              infoEl.style.left = `${x + (pointType === 'rank' ? 20 : 3)}px`;
-              infoEl.style.top = `${y}px`;
-            }
-          });
+          changePopupName(layer.options.name);
+          changePointLatLng(layer.getLatLng());
+          changePointType(layer.options.type);
+          // pointType = layer.options.type;
+          // showPopup();
         }
       }
     });
