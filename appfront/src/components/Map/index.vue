@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
-import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds } from 'leaflet';
+import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds, point } from 'leaflet';
 import 'leaflet-draw';
 import { onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue';
 import { svgTypes } from '@/assets/svg/svg';
@@ -23,8 +23,8 @@ defineOptions({
 })
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
-const { pointLatLng, isPopuped, popupName, pointType } = storeToRefs(selectStore);
-const { openPopup, closePopup, changePointLatLng, changePopupName, changePointType } = selectStore;
+const { pointLatLng, isPopuped, popupName } = storeToRefs(selectStore);
+const { openPopup, closePopup, changePointLatLng, changePopupName } = selectStore;
 let map = null;
 let Layer = null;
 let baseLayers = {};
@@ -62,15 +62,11 @@ const props = defineProps({
   isEdit: Boolean,
 });
 const showSearchPoi = (data, wrappedLayer) => {
-  // map.eachLayer(function (layer) {
-  //   if (layer !== Layer) { // 排除底图
-  //     map.removeLayer(layer);
-  //   }
-  // });
-  if (baseLayers['searchLayer']) {
-    map.removeLayer(baseLayers['searchLayer']);
-    baseLayers['searchLayer'] = null;
-  }
+  map.eachLayer(function (layer) {
+    if (layer !== Layer && layer !== baseLayers['selectedLayer']) { // 排除底图
+      map.removeLayer(layer);
+    }
+  });
   if (wrappedLayer) map.addLayer(wrappedLayer);
   const markers = layerGroup();
   baseLayers['searchLayer'] = markers;
@@ -118,13 +114,15 @@ const initMap = () => {
 const buildLayerTree = (data) => {
   Object.keys(data).forEach((type) => {
     const markersLayer = layerGroup();
-    data[type].forEach((point) => {
-      const { locationy, locationx } = point;
+    data[type].forEach((poi) => {
+      const { locationy, locationx } = poi;
       let svgIcon = divIcon({
         className: 'custom-svg-icon',
         html: svgTypes[type],
       });
-      marker([locationy, locationx], { icon: svgIcon, name: point.name, type: 'normal' }).addTo(markersLayer);
+      let markerLayer = marker([locationy, locationx], { icon: svgIcon}).addTo(markersLayer);
+      markerLayer.bindPopup(poi.name);
+      markerLayer.openPopup();
     })
     baseLayers[type] = markersLayer;
   });
@@ -139,7 +137,7 @@ const showPopup = () => {
   nextTick(() => {
     const infoEl = popup.value.$el;
     if (infoEl) {
-      infoEl.style.left = `${x + (pointType.value === 'rank' ? 20 : 3)}px`;
+      infoEl.style.left = `${x}px`;
       infoEl.style.top = `${y}px`;
     }
   });
@@ -162,14 +160,15 @@ const addPopupEvents = () => {
 
     // 遍历所有标记点
     map.eachLayer(function(layer) {
-      if (layer instanceof Marker) {
+      if (layer instanceof Marker && layer.options.type === 'rank') {
         // console.log('sss');
         // 获取标记点的图标大小
         let iconSize = layer.options.icon.options.iconSize;
         // 获取标记点在地图上的像素坐标
         let markerPoint = map.latLngToLayerPoint(layer.getLatLng());
+        console.log(markerPoint, '..');
         // 计算标记点的包围盒范围
-        let markerBounds = bounds(markerPoint, markerPoint.add([40, 40]));
+        let markerBounds = bounds(markerPoint.add([-10, -10]), markerPoint.add([40, 40]));
 
         // 判断点击的点是否在标记点的包围盒范围内
         if (markerBounds.contains(clickedPoint)) {
@@ -180,7 +179,6 @@ const addPopupEvents = () => {
           popupName.value = layer.options.name;
           changePopupName(layer.options.name);
           changePointLatLng(layer.getLatLng());
-          changePointType(layer.options.type);
           // pointType = layer.options.type;
           // showPopup();
         }
