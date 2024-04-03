@@ -45,9 +45,14 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
     });
     const { x, y, name } = newPoints[i]; 
     console.log(x, y, name, 'zz');
-    let markerLayer = marker([y, x], { icon: svgIcon, name: name, type: 'rank' }).addTo(markers);
-    console.log('markerLayer', markerLayer);
+    marker([y, x], { icon: svgIcon, name: name, type: 'rank' }).addTo(markers);
     if (i === 0) map.panTo([y, x]);
+  }
+  for (let i = 3; i < newPoints.length; i++) {
+    const { x, y, name } = newPoints[i]; 
+    let markerLayer = marker([y, x]).addTo(markers);
+    markerLayer.bindPopup(name);
+    markerLayer.openPopup();
   }
   map.addLayer(markers);
   
@@ -57,11 +62,15 @@ const props = defineProps({
   isEdit: Boolean,
 });
 const showSearchPoi = (data, wrappedLayer) => {
-  map.eachLayer(function (layer) {
-    if (layer !== Layer) { // 排除底图
-      map.removeLayer(layer);
-    }
-  });
+  // map.eachLayer(function (layer) {
+  //   if (layer !== Layer) { // 排除底图
+  //     map.removeLayer(layer);
+  //   }
+  // });
+  if (baseLayers['searchLayer']) {
+    map.removeLayer(baseLayers['searchLayer']);
+    baseLayers['searchLayer'] = null;
+  }
   if (wrappedLayer) map.addLayer(wrappedLayer);
   const markers = layerGroup();
   baseLayers['searchLayer'] = markers;

@@ -30,6 +30,9 @@ export const useSelectStore = defineStore('select', () => {
     console.log(selectedPoints.value[idx]);
     const { x, y, name } = selectedPoints.value[idx];
     pointStore.map.panTo([y, x]);
+    if (idx >= 3) { 
+      return;
+    }
     openPopup();
     changePopupName(name);
     changePointLatLng({lng: x, lat: y});
