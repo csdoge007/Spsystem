@@ -21,7 +21,6 @@ import Popup from '@/components/Popup/index.vue';
 defineOptions({
   name: 'Map'
 })
-// const popupName = ref('');
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
 const { pointLatLng, isPopuped, popupName, pointType } = storeToRefs(selectStore);
@@ -30,7 +29,6 @@ let map = null;
 let Layer = null;
 let baseLayers = {};
 const popup = ref(null);
-// const isPopuped = ref(false);
 watch(() => selectStore.selectedPoints, (newPoints) => {
 
   if (baseLayers['selectedLayer']) {
@@ -55,7 +53,6 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
   
 });
 const input = ref('');
-// console.log('input', input);
 const props = defineProps({
   isEdit: Boolean,
 });
