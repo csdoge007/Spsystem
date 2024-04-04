@@ -179,8 +179,6 @@ const addPopupEvents = () => {
           popupName.value = layer.options.name;
           changePopupName(layer.options.name);
           changePointLatLng(layer.getLatLng());
-          // pointType = layer.options.type;
-          // showPopup();
         }
       }
     });

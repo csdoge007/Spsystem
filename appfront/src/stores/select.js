@@ -6,12 +6,8 @@ export const useSelectStore = defineStore('select', () => {
   const isPopuped = ref(false);
   const pointLatLng = ref(null);
   const popupName = ref('');
-  const pointType = ref('');
   function changePopupName (newName) {
     popupName.value = newName;
-  }
-  function changePointType (type) {
-    pointType.value = type;
   }
   function changePointLatLng (newPosition) {
     pointLatLng.value = newPosition;
@@ -37,5 +33,5 @@ export const useSelectStore = defineStore('select', () => {
     changePopupName(name);
     changePointLatLng({lng: x, lat: y});
   }
-  return { changePointType, changePopupName, pointType, popupName, changePointLatLng, pointLatLng, selectedPoints, importSelectedPoints, panToActivePoint, isPopuped, closePopup, openPopup };
+  return { changePopupName, popupName, changePointLatLng, pointLatLng, selectedPoints, importSelectedPoints, panToActivePoint, isPopuped, closePopup, openPopup };
 });
