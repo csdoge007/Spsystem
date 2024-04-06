@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商选易达</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+    html,body,#map{
+      position: relative;
+      height: 100%;
+      margin: 0;
+    }
+
+    .btn {
+      position: absolute;
+      color: blue;
+      width: 50px;
+      height: 20px;
+      left: 20%;
+      top: 20%;
+      z-index: 10000;
+    }
+    </style>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  </head>
+  <body>
+    <div id="map">
+      <button class='btn'>按钮</button>
+    </div>
+      
+
+    <script>
+    let map = new L.Map('map');
+    let Layer = new L.TileLayer('http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}',{
+      cacheControl: 'public,max-age=3600' 
+    });
+    Layer.addTo(map);
+    let y = 32.1141;
+    let x = 118.93198;
+    let xl = 118.95;
+    map.setView([32.1141, 118.93198], 11);
+    let markerLayer = L.marker([32.1141, 118.83198]).addTo(map)    
+    markerLayer.bindPopup('你好');
+    markerLayer.openPopup();;
+    L.popup()
+     .setLatLng([y, x])
+     .setContent('hello')
+     .openOn(map);
+    let btn = document.querySelector('.btn');
+    btn.addEventListener('click', (e) => {
+      L.popup()
+        .setLatLng([y, x])
+        .setContent('hellol')
+        .openOn(map);
+      e.stopPropagation();
+    })
+    </script>
+  </body>
+</html>

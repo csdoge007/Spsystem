@@ -32,7 +32,7 @@
               v-model="form.radius"
               class="mx-4"
               :min="0"
-              :max="100"
+              :max="8"
               :precision="2" 
               :step="0.1"
               size="small"

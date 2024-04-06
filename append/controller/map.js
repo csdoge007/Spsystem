@@ -74,14 +74,14 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer, type } = req.query;
-    const indexQuery = `CREATE INDEX idx_type ON njpoi_2020_new (type);`;
-    pool_client.query(indexQuery, (err, result) => {
-      if (err) {
-        console.error('Error creating index', err);
-        return;
-      }
-      console.log('Index created successfully');
-    })
+    // const indexQuery = `CREATE INDEX idx_type ON njpoi_2020_new (type);`;
+    // pool_client.query(indexQuery, (err, result) => {
+    //   if (err) {
+    //     console.error('Error creating index', err);
+    //     return;
+    //   }
+    //   console.log('Index created successfully');
+    // })
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS
