@@ -1,19 +1,29 @@
 <template>
   <div class="edit">
-    <InfoSubmission :layers="layers" v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
-    <Map :isEdit="true"></Map>
+    <LeftSlide class="leftslide" :hideLeft="isHidden" @toggleRotation="toggleRotation">
+      <EditPanel></EditPanel>
+    </LeftSlide>
+    <div class="map-info">
+      <InfoSubmission :layers="layers" v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
+      <Map :isEdit="true"></Map>
+    </div>
   </div>
-
 </template>
 
 <script setup>
+import LeftSlide from '@/components/LeftSlide.vue';
 import { usePointStore } from '@/stores/point';
 import { ref, watch, nextTick } from 'vue';
 import InfoSubmission from '@/components/InfoSubmission/index.vue';
 import Map from '@/components/Map/index.vue';
+import EditPanel from '@/components/EditPanel/index.vue';
 defineOptions({
   name: 'Edit'
-})
+});
+const isHidden = ref(true);
+const toggleRotation = () => {
+  isHidden.value = !isHidden.value;
+};
 const layers = ref([
       { label: '图层0', value: 'layer0' },
     ]); // 选项数组
@@ -43,5 +53,12 @@ const hide = () => hidden.value = true;
 .edit {
   position: relative;
   height: 100%;
+  margin: 0;
+  display: flex;
+}
+.map-info {
+  position: relative;
+  height: 100%;
+  width:100%;
 }
 </style>
