@@ -1,9 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Login from '../views/login/index.vue';
 import Admin from '../views/admin/index.vue';
-
 import Select from '../views/select/index.vue';
 import Edit from '../views/edit/index.vue';
+import { useMenuStore } from '@/stores/menu';
 const routes = [
   { path: '/', name: 'login', component: Login },
   { 
@@ -40,6 +40,8 @@ router.beforeEach((to, from, next) => {
         path: '/',
       })
     } else {
+      const menuStore = useMenuStore();
+      menuStore.setActiveItem(to.name);
       next();
     }
   }

@@ -3,33 +3,34 @@ import axiosInstance from './index'
 
 const axios = axiosInstance
 
-export const getBooks = () => {return axios.get(`http://localhost:3000/api/books/`)}
+export const getBooks = () => {return axios.get(`/api/books/`)}
 
-export const postBook = (bookName, bookAuthor) => {return axios.post(`http://localhost:3000/api/books/`, {'name': bookName, 'author': bookAuthor})}
+export const postBook = (bookName, bookAuthor) => {return axios.post(`/api/books/`, {'name': bookName, 'author': bookAuthor})}
 
-export const getPoi = () => axios.get('http://localhost:3000/');
+export const getPoi = () => axios.get('/');
 
-export const searchPoi = (name) => axios.get('http://localhost:3000/searchPoi', {
+export const searchPoi = (name) => axios.get('/searchPoi', {
   params: {
     query: name
   }
 });
 
-export const boxSelectPoi = (polygon) => axios.post('http://localhost:3000/boxSelectPoi', { 
+export const boxSelectPoi = (polygon) => axios.post('/boxSelectPoi', { 
   polygon 
 });
 
-export const login = (userInfo) => axios.post('http://localhost:3000/login', {
+export const login = (userInfo) => axios.post('/login', {
   userInfo
 });
 
-export const pointInfoSub = (pointInfo) => axios.post('http://localhost:3000/addPoint' ,{
+export const pointInfoSub = (pointInfo) => axios.post('/addPoint' ,{
   pointInfo
 });
 
-export const getAccessibility = (selectInfo) => axios.get('http://localhost:3000/getAccessibility', {
+export const getAccessibility = (selectInfo) => axios.get('/getAccessibility', {
   params: {
     ...selectInfo
   }
 });
 
+export const getLayers = () => axios.get('/getLayers');

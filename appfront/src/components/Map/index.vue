@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
-import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds, point } from 'leaflet';
+import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds } from 'leaflet';
 import 'leaflet-draw';
 import { onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue';
 import { svgTypes } from '@/assets/svg/svg';

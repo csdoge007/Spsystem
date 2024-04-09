@@ -8,9 +8,11 @@
 
 <script setup>
 import ManagerHeader from './ManagerHeader/index.vue';
+import { getLayers } from '@/api/api';
 defineOptions({
   name: 'BasicManager',
-})
+});
+getLayers().then(result => console.log(result.data));
 </script>
 
 <style scoped>

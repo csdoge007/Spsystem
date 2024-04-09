@@ -8,10 +8,10 @@
         text-color="#fff"
         @open="handleOpen"
         @close="handleClose"
-        :default-active="active"
+        :default-active="activeMenuItem"
         unique-opened
       >
-        <el-menu-item index="1" @click="goTo('edit')">
+        <el-menu-item index="edit" @click="goTo('edit')">
           <template #title>
             <el-icon><Edit /></el-icon>
             <span>企业制图</span>
@@ -23,7 +23,7 @@
             <span>智能选址</span>
           </template>
           <el-menu-item index="2-1">数据管理</el-menu-item>
-          <el-menu-item index="2-2" @click="goTo('select')">选址规划</el-menu-item>
+          <el-menu-item index="select" @click="goTo('select')">选址规划</el-menu-item>
           <el-menu-item index="2-3">我的收藏</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="3">
@@ -46,8 +46,10 @@ import {
   Setting
 } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
-import { ref, watch } from 'vue';
-const active = ref('2-2');
+import { storeToRefs } from 'pinia';
+import { useMenuStore } from '@/stores/menu';
+const menuStore = useMenuStore();
+const { activeMenuItem } = storeToRefs(menuStore);
 const router = useRouter();
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
@@ -63,14 +65,14 @@ const goTo = (name) => {
     }
   });
 };
-watch(active, (newValue) => {
-  router.push({
-    name: 'select',
-    params: {
-      id: router.currentRoute.value.params.id,
-    }
-  });
-}, { immediate: true })
+// watch(active, (newValue) => {
+//   router.push({
+//     name: 'select',
+//     params: {
+//       id: router.currentRoute.value.params.id,
+//     }
+//   });
+// }, { immediate: true })
 </script>
 <style scoped>
 .name {
