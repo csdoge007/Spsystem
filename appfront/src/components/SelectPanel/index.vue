@@ -7,7 +7,8 @@
           <PanelItem 
             :rank="idx + 1" 
             :name="point.name"
-            :accessibility="point.resultSums">
+            :accessibility="point.resultSums"
+            :category="point.category">
           </PanelItem>
         </template>
       </el-collapse-item>
@@ -30,10 +31,10 @@ const changeActiveItem = (activeItemIndex) => {
 
 <style scoped>
 :deep(.el-collapse-item__header) {
-    height: 100px;
+  height: 100px;
 }
-.collapse {
-  height: 1000px;
-  overflow: auto;
+.el-collapse {
+  height: 600px; /* 设置最大高度，以便内容超出时出现滚动条 */
+  overflow-y: auto; 
 }
 </style>

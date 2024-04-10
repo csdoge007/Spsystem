@@ -10,7 +10,9 @@
         {{ rank }}
       </template> 
     </div>
-    <div class="name">{{ name }}</div>
+    <div class="name">
+      {{ name }}
+    </div>
     <div class="accessibility">
       <div class="accessibility-value">{{ accessibility }}</div>
       <div class="accessibility-text">可达性指数</div>
@@ -19,7 +21,6 @@
 </template>
 
 <script setup>
-// import { defineProps } from 'vue';
 defineOptions({
   name: 'PanelItem',
 })
@@ -35,6 +36,10 @@ const props = defineProps({
   accessibility: {
     type: String,
     required: true
+  },
+  category: {
+    type: String,
+    required: true,
   }
 });
 </script>
@@ -60,7 +65,6 @@ const props = defineProps({
   font-size: 20px;
   text-align: left; 
 }
-
 .accessibility {
   display: flex;
   flex-direction: column;

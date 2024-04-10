@@ -23,8 +23,4 @@ const activeName = ref('manager');
 </script>
 
 <style scoped>
-.collapse {
-  height: 1000px;
-  overflow: auto;
-}
 </style>

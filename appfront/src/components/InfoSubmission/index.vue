@@ -23,8 +23,15 @@
     
     <el-row>
       <el-col :span="12">
-        <el-form-item label="描述">
-          <el-input v-model="form.description" />
+        <el-form-item label="网点类别" prop="category">
+          <el-select v-model="form.category" placeholder="请选择网点类别">
+            <el-option
+              v-for="category in categorys"
+              :key="category"
+              :label="category"
+              :value="category">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-col>
       <el-col :span="12">
@@ -34,6 +41,13 @@
       </el-col>
     </el-row>
 
+    <el-row>
+      <el-col :span="12">
+        <el-form-item label="描述">
+          <el-input v-model="form.description" />
+        </el-form-item>
+      </el-col>
+    </el-row>
     <el-form-item class="flex-container">
       <el-button @click="onCancel">取消</el-button>
       <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
@@ -46,6 +60,7 @@
 import { usePointStore } from '@/stores/point';
 import { reactive, ref, watch } from 'vue';
 import { pointInfoSub } from '@/api/api';
+import categorys from './static/index';
 const emit = defineEmits(['hide']);
 const pointStore = usePointStore();
 defineOptions({
@@ -63,6 +78,9 @@ const rules = reactive({
   ],
   title: [
     { required: true, message: '网点名称不能为空', trigger: 'blur' },
+  ],
+  category: [
+    { required: true, message: '网点类别不能为空', trigger: 'blur' },
   ]
 })
 
@@ -73,6 +91,7 @@ const form = reactive({
   title: '',
   description: '',
   address: '',
+  category: '',
 });
 watch(() => props.options, () => {
   form.layer = props.options
@@ -106,7 +125,7 @@ const onCancel = () => {
 }
 .info {
   width: 600px;
-  height: 140px;
+  height: 180px;
   position: absolute;
   transform: translate(-50%, calc(-100% - 50px));
   z-index: 1000;

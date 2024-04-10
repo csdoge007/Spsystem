@@ -134,6 +134,7 @@ export async function getAccessibility(req, res, next) {
       return {
         resultSums: result.rows[0].result_sum.toFixed(2),
         name: points[idx].title,
+        category: points[idx].category,
         x: points[idx].locationx,
         y: points[idx].locationy,
       }
@@ -164,10 +165,10 @@ export async function addPoint(req, res, next) {
   try {
     const { pointInfo } = req.body;
     console.log(pointInfo);
-    const { layer, title, description, address, x, y } = pointInfo;
+    const { layer, title, description, address, x, y, category } = pointInfo;
     pool_client = await pool.connect();
-    const sql = 'INSERT INTO point (title, layer, locationx, locationy, description, address) VALUES ($1, $2, $3, $4, $5, $6)';
-    await pool_client.query(sql, [title, layer, x, y, description, address]);
+    const sql = 'INSERT INTO point (title, layer, locationx, locationy, description, address, category) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+    await pool_client.query(sql, [title, layer, x, y, description, address, category]);
     res.status(200).send();
   } catch (err) {
     next(err);

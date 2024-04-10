@@ -1,23 +1,27 @@
 import Mock from 'mockjs';
 function getLayers() {
   const layers = [
+    // {
+    //   type: 'group',
+    //   name: '商店',
+    //   faGroup: '',
+    //   quantity: 1,
+    //   children: [
+    //     {
+    //       type: 'pointLayer',
+    //       name: '高级商店',
+    //       faGroup: '商店',
+    //       quantity: 0,
+    //       children: [],
+    //     }
+    //   ],
+    // },
     {
-      type: 'group',
-      name: '商店',
-      faGroup: '',
-      quantity: 0,
-      children: [
-        {
-          type: 'layer',
-          name: '高级商店',
-          faGroup: '商店',
-        }
-      ],
-    },
-    {
-      type: 'layer',
+      type: 'pointLayer',
       name: '高级餐厅',
-      faGroup: '',
+      // faGroup: '',
+      quantity: 0,
+      children: [],
     },
   ];
   return layers;
