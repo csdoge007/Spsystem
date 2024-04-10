@@ -1,4 +1,3 @@
-import xlsx from 'xlsx';
 import coordtransform from 'coordtransform';
 
 // 读取 Excel 表格数据
