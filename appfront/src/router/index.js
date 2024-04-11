@@ -14,12 +14,12 @@ const routes = [
       {
         path: 'select',
         component: Select,
-        name: 'select',
+        name: 'Select',
       },
       {
         path: 'edit',
         component: Edit,
-        name: 'edit',
+        name: 'Edit',
       }
     ] 
   },
