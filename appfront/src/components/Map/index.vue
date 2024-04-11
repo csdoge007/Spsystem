@@ -1,7 +1,7 @@
 <template>
   <div id="map">
     <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
-    <Popup :name="popupName" ref="popup" v-if="isPopuped" @close="closePopup"></Popup>
+    <Popup :name="popupName" ref="popup" v-if="isPopuped && !isEdit" @close="closePopup"></Popup>
   </div>
 </template>
 
