@@ -6,3 +6,6 @@ html,body,#map, #app {
 .el-collapse-item__arrow {
   display: none;
 }
+.el-dialog {
+  border-radius: 15px;
+}

@@ -22,9 +22,10 @@ export async function login (req, res, next) {
         msg: '账号密码错误',
         data: null,
       });
+      console.log('密码错误');
       return;
     }
-
+    console.log('密码正确');
     const token = jwt.sign(
       {
         id: userInfo._id,

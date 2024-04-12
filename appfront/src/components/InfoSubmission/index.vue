@@ -1,6 +1,6 @@
 <template>
   <div class="info">
-    <el-form ref="ruleFormRef" :rules="rules" :model="form" label-width="100px" style="max-width: 600px" class="demo-ruleForm">
+  <el-form ref="ruleFormRef" :rules="rules" :model="form" label-width="100px" style="max-width: 600px" class="demo-ruleForm">
     <el-row>
       <el-col :span="12">
         <el-form-item label="加入图层" prop="layer">

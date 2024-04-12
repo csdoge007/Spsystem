@@ -15,16 +15,16 @@
       </el-main>
     </el-container>
   </el-container>
+  <LayerInfo></LayerInfo>
 </template>
 
-<script>
+<script setup>
 import Navigator from '@/components/Navigator.vue';
-export default {
-  name: 'Admin',
-  components: {
-    Navigator
-  }
-}
+import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
+
+defineOptions({
+  name: 'Admin'
+});
 </script>
 
 <style lang="scss" scoped>

@@ -59,13 +59,12 @@ const onLogin = async (formEl) => {
   await formEl.validate(async (valid, fields) => {
     if (valid) {
       const { account, password } = ruleForm;
-      console.log(account, password);
       try {
         const res = await login({account, password});
         loading.value = false;
         localStorage.setItem('token', res.data.data);
         router.push({
-          name: 'select',
+          name: 'Select',
           params: {
             id: account,
           }
@@ -73,6 +72,7 @@ const onLogin = async (formEl) => {
       } catch (error) {
         loading.value = false;
         showError.value = true;
+        console.error(error);
       }
     } else {
       loading.value = false;
