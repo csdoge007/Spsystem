@@ -54,8 +54,8 @@ const clearError = () => {
   showError.value = false;
 };
 const onLogin = async (formEl) => {
-  loading.value = true;
   if (!formEl) return;
+  loading.value = true;
   await formEl.validate(async (valid, fields) => {
     if (valid) {
       const { account, password } = ruleForm;

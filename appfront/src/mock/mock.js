@@ -26,4 +26,9 @@ function getLayers() {
   ];
   return layers;
 }
+function getGroups() {
+  const groups = [];
+  return groups;
+};
 Mock.mock('http://localhost:3000/getLayers', getLayers); 
+Mock.mock('http://localhost:3000/getGroups', getGroups);

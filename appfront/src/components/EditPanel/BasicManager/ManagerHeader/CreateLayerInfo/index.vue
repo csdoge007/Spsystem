@@ -39,20 +39,26 @@
       </el-form-item>
       <el-form-item label="所属分组" prop="group">
         <el-select v-model="form.name" placeholder="请选择所属分组">
-          <el-option>
+          <el-option 
+            v-for="group in groups"
+            :key="group"
+            :label="group"
+            :value="group">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item class="flex-container">
         <el-button @click="onCancel">取消</el-button>
-        <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
+        <el-button type="primary" @click="onSubmit(ruleFormRef)" :loading="loading">保存</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script setup>  
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
+import { getGroups } from '@/api/api';
+import { ElMessage } from 'element-plus'
 defineOptions({
   name: 'LayerInfo'
 })
@@ -61,6 +67,7 @@ import { useDialogStore } from '@/stores/dialog.js';
 const dialogStore = useDialogStore();
 const { layerDialog } = storeToRefs(dialogStore);
 const ruleFormRef = ref();
+const loading = ref(false);
 const rules = reactive({
   name: [
     { required: true, message: '请选择目标图层', trigger: 'blur' },
@@ -74,7 +81,30 @@ const activeSign = reactive({
   point: false,
   surface: false,
   line: false,
-})
+});
+const type = computed(() => {
+  const typeArr = Object.keys(activeSign).filter(item => activeSign[item])
+  return typeArr.length > 0 ? typeArr[0] : 'temp';
+});
+const onSubmit = async (formEl) => {
+  if (!formEl) return;
+  if (type.value === 'temp') {
+    ElMessage({
+      message: '请选择图层类型',
+      type: 'warning',
+    });
+    return;
+  }
+  loading.value = true;
+  await formEl.validate(async (valid, fields) => {
+    if (valid) {
+      
+    } else {
+      loading.value = false;
+      console.log('error submit!', fields)
+    }
+  })
+}
 const handleClick = (event) => {
   const className = event.currentTarget.classList[0];
   console.log(className);
@@ -85,6 +115,10 @@ const handleClick = (event) => {
     activeSign[className] = true;
   }
 };
+const groups = ref([]);
+onMounted(async () => {
+  groups.value = await getGroups().then(res => res.data);
+});
 </script>
 
 <style scoped>
