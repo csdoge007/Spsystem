@@ -2,7 +2,7 @@
   <div class="basic">
     <ManagerHeader></ManagerHeader>
       <el-collapse accordion>
-        <el-collapse-item v-for="(value, idx) in layersData" :key="idx" :name="idx">
+        <el-collapse-item v-for="(value, idx) in layers" :key="idx" :name="idx">
           <template #title>
             <EditItemHeader v-bind="value"></EditItemHeader>
           </template>
@@ -13,16 +13,19 @@
 
 <script setup>
 import ManagerHeader from './ManagerHeader/index.vue';
-import { getLayers } from '@/api/api';
 import EditItemHeader from './EditItem/EditItemHeader/index.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
+import { useLayerStore } from '@/stores/layer';
+import { storeToRefs } from 'pinia';
 defineOptions({
   name: 'BasicManager',
 });
-let layersData = ref([]);
+const layerStore = useLayerStore();
+const { layers } = storeToRefs(layerStore);
+const { fetchLayers } = layerStore;
 onMounted(async () => {
-  layersData.value = await getLayers().then(res => res.data);
-})
+  await fetchLayers();
+});
 </script>
 
 <style scoped>

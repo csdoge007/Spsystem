@@ -4,6 +4,9 @@ export const useDialogStore = defineStore('dialog', () => {
   const layerDialog = ref(false);
   const openLayerDialog = () => {
     layerDialog.value = true;
-  }
-  return { layerDialog, openLayerDialog };
+  };
+  const closeLayerDialog = () => {
+    layerDialog.value = false;
+  };
+  return { layerDialog, openLayerDialog, closeLayerDialog };
 });

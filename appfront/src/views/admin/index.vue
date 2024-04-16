@@ -15,13 +15,16 @@
       </el-main>
     </el-container>
   </el-container>
-  <LayerInfo></LayerInfo>
+  <LayerInfo v-if="layerDialog"></LayerInfo>
 </template>
 
 <script setup>
 import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
-
+import { storeToRefs } from 'pinia';
+import { useDialogStore } from '@/stores/dialog.js';
+const dialogStore = useDialogStore();
+const { layerDialog } = storeToRefs(dialogStore);
 defineOptions({
   name: 'Admin'
 });

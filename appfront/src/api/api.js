@@ -35,3 +35,6 @@ export const getAccessibility = (selectInfo) => axios.get('/getAccessibility', {
 
 export const getLayers = () => axios.get('/getLayers');
 export const getGroups = () => axios.get('/getGroups');
+export const addLayer = (layerInfo) => axios.post('/addLayer', {
+  layerInfo,
+});

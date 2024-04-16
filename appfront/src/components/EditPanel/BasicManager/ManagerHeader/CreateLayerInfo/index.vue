@@ -38,7 +38,7 @@
         <el-input v-model="form.name" placeholder="请输入名称" />
       </el-form-item>
       <el-form-item label="所属分组" prop="group">
-        <el-select v-model="form.name" placeholder="请选择所属分组">
+        <el-select v-model="form.group" placeholder="请选择所属分组">
           <el-option 
             v-for="group in groups"
             :key="group"
@@ -57,15 +57,19 @@
 
 <script setup>  
 import { ref, reactive, computed, onMounted } from 'vue';
-import { getGroups } from '@/api/api';
-import { ElMessage } from 'element-plus'
+import { getGroups, addLayer } from '@/api/api';
+import { ElMessage } from 'element-plus';
 defineOptions({
   name: 'LayerInfo'
 })
 import { storeToRefs } from 'pinia';
 import { useDialogStore } from '@/stores/dialog.js';
+import { useLayerStore } from '@/stores/layer.js';
 const dialogStore = useDialogStore();
+const layerStore = useLayerStore();
 const { layerDialog } = storeToRefs(dialogStore);
+const { closeLayerDialog } = dialogStore;
+const { fetchLayers } = layerStore;
 const ruleFormRef = ref();
 const loading = ref(false);
 const rules = reactive({
@@ -86,6 +90,9 @@ const type = computed(() => {
   const typeArr = Object.keys(activeSign).filter(item => activeSign[item])
   return typeArr.length > 0 ? typeArr[0] : 'temp';
 });
+const onCancel = () => {
+  closeLayerDialog();
+}
 const onSubmit = async (formEl) => {
   if (!formEl) return;
   if (type.value === 'temp') {
@@ -95,12 +102,19 @@ const onSubmit = async (formEl) => {
     });
     return;
   }
-  loading.value = true;
   await formEl.validate(async (valid, fields) => {
     if (valid) {
-      
+      const layerInfo = {
+        type: type.value,
+        name: form.name,
+        quantity: 0,
+        group: form.group,
+      };
+      console.log('layerInfo', layerInfo);
+      await addLayer(layerInfo);
+      closeLayerDialog();
+      fetchLayers();
     } else {
-      loading.value = false;
       console.log('error submit!', fields)
     }
   })
