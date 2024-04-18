@@ -30,6 +30,7 @@ const { openLayerDialog } = dialogStore;
 const handleMouseOver = (event) => {
   event.currentTarget.querySelector('span')?.classList.add('highlighted');
   event.currentTarget.querySelector('svg')?.classList.add('blue');
+  console.log('hh');
 };
 const handleMouseOut = (event) => {
   event.currentTarget.querySelector('span')?.classList.remove('highlighted');

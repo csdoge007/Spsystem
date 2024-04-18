@@ -32,8 +32,7 @@ const props = defineProps({
 .edit-item {
   display: flex;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  border-bottom: 1px solid #ccc;
+  position: absolute;
+  left: 15px;
 }
 </style>
