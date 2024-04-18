@@ -10,6 +10,12 @@ export const useSelectStore = defineStore('select', () => {
     popupName.value = newName;
   }
   function changePointLatLng (newPosition) {
+    if (pointLatLng.value !== null) {
+      const { lat, lng } = pointLatLng.value;
+      if (lat === newPosition.lat && lng === newPosition.lng) {
+        return;
+      }
+    }
     pointLatLng.value = newPosition;
   }
   function closePopup (){
