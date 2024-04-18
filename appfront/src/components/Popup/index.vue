@@ -50,6 +50,6 @@ const close = () => {
   right: 3px;
   cursor: pointer;
   color: #666;
-  font-size: 1px;
+  font-size: 10px;
 }
 </style>

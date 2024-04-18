@@ -122,7 +122,7 @@ export async function getAccessibility(req, res, next) {
       console.log('Function created successfully');
     });
     // 查询layer名为layer的点
-    const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1', [layer]);
+    const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1 And category = $2', [layer, type]);
     const points = resultPoints.rows;
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);

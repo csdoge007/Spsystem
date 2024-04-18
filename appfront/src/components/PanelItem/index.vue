@@ -86,7 +86,7 @@ const props = defineProps({
   height: 25px;
   width: 100px;
   display: flex;
-  font-size: 5px;
+  font-size: 12px;
   color: black;
   background-color: rgb(247,247,247); 
   align-items: center;
