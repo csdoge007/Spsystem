@@ -108,7 +108,7 @@ const onSubmit = async (formEl) => {
         type: type.value,
         name: form.name,
         quantity: 0,
-        group: form.group,
+        group_name: form.group,
       };
       console.log('layerInfo', layerInfo);
       await addLayer(layerInfo);

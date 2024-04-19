@@ -30,11 +30,11 @@ function getGroups() {
   const groups = [];
   return groups;
 };
-function addLayer(req) {
-  const { layerInfo } = JSON.parse(req.body);
-  layers.push(layerInfo);
-  console.log(layerInfo);
-}
+// function addLayer(req) {
+//   const { layerInfo } = JSON.parse(req.body);
+//   layers.push(layerInfo);
+//   console.log(layerInfo);
+// }
 // Mock.mock('http://localhost:3000/getLayers', getLayers); 
 Mock.mock('http://localhost:3000/getGroups', getGroups);
-Mock.mock('http://localhost:3000/addLayer', addLayer);
+// Mock.mock('http://localhost:3000/addLayer', addLayer);
