@@ -167,8 +167,14 @@ export async function addPoint(req, res, next) {
     console.log(pointInfo);
     const { layer, title, description, address, x, y, category } = pointInfo;
     pool_client = await pool.connect();
-    const sql = 'INSERT INTO point (title, layer, locationx, locationy, description, address, category) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-    await pool_client.query(sql, [title, layer, x, y, description, address, category]);
+    const insertSql = `
+    INSERT INTO point (title, layer, locationx, locationy, description, address, category) VALUES ($1, $2, $3, $4, $5, $6, $7);
+    `;
+    const updateSql = `
+    UPDATE layer SET quantity = quantity + 1 WHERE name = $1;
+    `
+    await pool_client.query(insertSql, [title, layer, x, y, description, address, category]);
+    await pool_client.query(updateSql, [layer]);
     res.status(200).send();
   } catch (err) {
     next(err);

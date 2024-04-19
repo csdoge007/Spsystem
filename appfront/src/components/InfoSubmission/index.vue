@@ -6,10 +6,10 @@
         <el-form-item label="加入图层" prop="layer">
           <el-select v-model="form.layer" placeholder="请选择目标图层">
             <el-option
-              v-for="option in layers"
-              :key="option.value"
-              :label="option.label"
-              :value="option.value">
+              v-for="layer in pointLayers"
+              :key="layer.name"
+              :label="layer.name"
+              :value="layer.name">
             </el-option>
           </el-select>
         </el-form-item>
@@ -58,19 +58,21 @@
 
 <script setup>
 import { usePointStore } from '@/stores/point';
-import { reactive, ref, watch } from 'vue';
+import { useLayerStore } from '@/stores/layer';
+import { reactive, ref, computed } from 'vue';
 import { pointInfoSub } from '@/api/api';
 import categorys from './static/index';
+import { storeToRefs } from 'pinia';
 const emit = defineEmits(['hide']);
 const pointStore = usePointStore();
 defineOptions({
   name: 'InfoSubmission'
 })
 // import { loginRules } from "./utils/rule";
-const props = defineProps({
-  layers: Array,
-})
-
+const layerStore = useLayerStore();
+const { layers } = storeToRefs(layerStore);
+const pointLayers = computed(() => layers.value.filter((layer) => layer.type === 'point'));
+const { fetchLayers } = layerStore;
 const ruleFormRef = ref();
 const rules = reactive({
   layer: [
@@ -93,12 +95,6 @@ const form = reactive({
   address: '',
   category: '',
 });
-watch(() => props.options, () => {
-  form.layer = props.options
-}, {
-  immediate: true
-});
-
 const onSubmit = async (formEl) => {
   if (!formEl) return;
   await formEl.validate(async (valid, fields) => {
@@ -108,6 +104,7 @@ const onSubmit = async (formEl) => {
       await pointInfoSub({...form, x: locationx, y: locationy });
       emit('hide');
       pointStore.edited();
+      fetchLayers();
     } else {
       console.log('error submit!', fields)
     }

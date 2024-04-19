@@ -16,7 +16,6 @@
 <script setup>
 import ManagerHeader from './ManagerHeader/index.vue';
 import EditItemHeader from './EditItem/EditItemHeader/index.vue';
-import { onMounted } from 'vue';
 import { useLayerStore } from '@/stores/layer';
 import { storeToRefs } from 'pinia';
 defineOptions({
@@ -24,11 +23,6 @@ defineOptions({
 });
 const layerStore = useLayerStore();
 const { layers } = storeToRefs(layerStore);
-const { fetchLayers } = layerStore;
-onMounted(async () => {
-  await fetchLayers();
-  console.log(layers.value);
-});
 </script>
 
 <style scoped>

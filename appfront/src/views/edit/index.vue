@@ -4,7 +4,7 @@
       <EditPanel></EditPanel>
     </LeftSlide>
     <div class="map-info">
-      <InfoSubmission :layers="layers" v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
+      <InfoSubmission v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
       <Map :isEdit="true"></Map>
     </div>
   </div>
@@ -13,10 +13,13 @@
 <script setup>
 import LeftSlide from '@/components/LeftSlide.vue';
 import { usePointStore } from '@/stores/point';
-import { ref, watch, nextTick } from 'vue';
+import { useLayerStore } from '@/stores/layer';
+import { ref, watch, nextTick, onMounted } from 'vue';
 import InfoSubmission from '@/components/InfoSubmission/index.vue';
 import Map from '@/components/Map/index.vue';
 import EditPanel from '@/components/EditPanel/index.vue';
+const layerStore = useLayerStore();
+const { fetchLayers } = layerStore;
 defineOptions({
   name: 'Edit'
 });
@@ -24,9 +27,10 @@ const isHidden = ref(true);
 const toggleRotation = () => {
   isHidden.value = !isHidden.value;
 };
-const layers = ref([
-      { label: '图层0', value: 'layer0' },
-    ]); // 选项数组
+// const layers = ref([
+//       { label: '图层0', value: 'layer0' },
+//     ]); 
+const layers = ref([]);
 const pointStore = usePointStore();
 const hidden = ref(true);
 const infoSubmission = ref(null);
@@ -47,6 +51,10 @@ watch(() => pointStore.position, (position) => {
   }
 })
 const hide = () => hidden.value = true;
+onMounted(async () => {
+  await fetchLayers();
+  console.log(layers.value);
+});
 </script>
 
 <style scoped>
