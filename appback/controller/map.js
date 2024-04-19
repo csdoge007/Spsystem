@@ -1,6 +1,6 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
-import { circleSelectPoi } from "../service/map.js";
+import { circleSelectPoi, readLayers } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -183,5 +183,17 @@ export async function addPoint(req, res, next) {
         console.error('Error releasing pool client:', err);
       }
     }
+  }
+};
+
+export async function getLayers(req, res, next) {
+  try {
+    const layers = await readLayers();
+    console.log(layers);
+    res.status(200).send(layers);
+  } catch (err) {
+    next(err);
+    console.error(err);
+    res.send("Error" + err);
   }
 };

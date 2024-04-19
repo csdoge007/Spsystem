@@ -27,6 +27,7 @@ const { layers } = storeToRefs(layerStore);
 const { fetchLayers } = layerStore;
 onMounted(async () => {
   await fetchLayers();
+  console.log(layers.value);
 });
 </script>
 

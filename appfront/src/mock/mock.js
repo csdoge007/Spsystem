@@ -18,14 +18,14 @@ const layers = [
   {
     type: 'point',
     name: '高级餐厅',
-    group: '',
+    group: ' ',
     quantity: 0,
     children: [],
   },
 ];
-function getLayers() {
-  return layers;
-}
+// function getLayers() {
+//   return layers;
+// }
 function getGroups() {
   const groups = [];
   return groups;
@@ -35,6 +35,6 @@ function addLayer(req) {
   layers.push(layerInfo);
   console.log(layerInfo);
 }
-Mock.mock('http://localhost:3000/getLayers', getLayers); 
+// Mock.mock('http://localhost:3000/getLayers', getLayers); 
 Mock.mock('http://localhost:3000/getGroups', getGroups);
 Mock.mock('http://localhost:3000/addLayer', addLayer);

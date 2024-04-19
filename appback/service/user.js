@@ -12,4 +12,4 @@ export async function getUserByAccount(account) {
     }
   }
   return result.rows[0];
-}
+};
