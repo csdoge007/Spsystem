@@ -37,6 +37,7 @@ onMounted(async () => {
 }
 :deep(.el-collapse-item__header) {
   height: 60px;
+  border-bottom: 0px;
 }
 .el-collapse {
   height: 600px; 
@@ -65,6 +66,7 @@ onMounted(async () => {
   border-bottom: 5px solid blue;
 }
 :deep(.el-collapse-item__header.is-active) {
-  background-color: rgba(242,245,255,0.8);
+  background-color: rgba(242,245,255,0.6);
+  color: rgb(91,125,219);
 }
 </style>
