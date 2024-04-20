@@ -5,7 +5,7 @@
         <el-collapse-item v-for="(value, idx) in layers" :key="value.name" :name="idx">
           <div class="triangle"></div>
           <template #title>
-              <EditItemHeader v-bind="value"></EditItemHeader>
+              <EditItemHeader v-bind="value" :isActived="idx === activeIdx"></EditItemHeader>
           </template>
           Hello
         </el-collapse-item>
@@ -18,11 +18,16 @@ import ManagerHeader from './ManagerHeader/index.vue';
 import EditItemHeader from './EditItem/EditItemHeader/index.vue';
 import { useLayerStore } from '@/stores/layer';
 import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
 defineOptions({
   name: 'BasicManager',
 });
 const layerStore = useLayerStore();
 const { layers } = storeToRefs(layerStore);
+const activeIdx = ref(-1);
+const toggleItem = (idx) => {
+  activeIdx.value = idx;
+}
 </script>
 
 <style scoped>

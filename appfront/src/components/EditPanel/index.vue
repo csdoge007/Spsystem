@@ -23,4 +23,7 @@ const activeName = ref('manager');
 </script>
 
 <style scoped>
+:deep(.el-tabs__header) {
+  margin-bottom: 0;
+}
 </style>

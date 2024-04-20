@@ -7,10 +7,23 @@
     <span class="quantity" style="margin-left: 4px; color: rgb(172,175,189)">
       ({{ quantity }})
     </span>
+    <el-icon :class="{ active: isActived }" @click="changeView">
+      <template v-if="isViewed">
+        <View />
+      </template>
+      <template v-else>
+        <Hide />
+      </template>
+    </el-icon>
   </div>
 </template>
 
 <script setup>
+import { View, Hide } from '@element-plus/icons-vue';
+import { ref, watch } from 'vue';
+import { useLayerStore } from '@/stores/layer';
+const layerStore = useLayerStore();
+const { drawElements, clearElements } = layerStore; 
 defineOptions({
   name: 'EditItemHeader',
 });
@@ -31,16 +44,45 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  isActived: {
+    type: Boolean,
+    required: true,
+  }
 });
-console.log(props.type);
+const isViewed = ref(true);
+const changeView = (event) => {
+  isViewed.value = !isViewed.value;
+  event.stopPropagation();
+}
+watch(isViewed, (newValue) => {
+  if (!props.children || props.children.length <= 0) return;
+  if (newValue) {
+    const { type, name, children } = props;
+    drawElements({type, name, children});
+  } else {
+    clearElements(props.name);
+  }
+})
 </script>
 
 <style scoped>
 .edit-item {
   display: flex;
   align-items: center;
-  position: absolute;
+  position: relative;
   left: 15px;
   font-size: 15px;
+  width: 100%;
+}
+.el-icon {
+  position: absolute;
+  right: 20px;
+  opacity: 0;
+}
+.edit-item:hover .el-icon{
+  opacity: 1;
+}
+.active {
+  opacity: 1;
 }
 </style>
