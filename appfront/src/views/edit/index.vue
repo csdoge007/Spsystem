@@ -53,7 +53,6 @@ watch(() => pointStore.position, (position) => {
 const hide = () => hidden.value = true;
 onMounted(async () => {
   await fetchLayers();
-  console.log(layers.value);
 });
 </script>
 

@@ -1,6 +1,6 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
-import { circleSelectPoi, readLayers, createLayer } from "../service/map.js";
+import { circleSelectPoi, readLayers, createLayer, getElements } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -196,6 +196,16 @@ export async function getLayers(req, res, next) {
   try {
     const layers = await readLayers();
     console.log(layers);
+    const layerMap = new Map();
+    for (const layer of layers) {
+      layerMap[layer.name] = layer;
+    }
+    // 获取点、线、面三要素
+    const elements = await getElements();
+    for (const element of elements) {
+      const layer = layerMap[element.layer];
+      layer.children = layer.children ? [...layer.children, element] : [element];
+    }
     res.status(200).send(layers);
   } catch (err) {
     next(err);
