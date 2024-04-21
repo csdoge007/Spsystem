@@ -7,6 +7,7 @@
 
 <script setup>
 import { usePointStore } from '@/stores/point';
+import { useLayerStore } from '@/stores/layer';
 import { storeToRefs } from 'pinia';
 import debounce from 'lodash.debounce';
 import 'leaflet/dist/leaflet.css';
@@ -21,6 +22,7 @@ import Popup from '@/components/Popup/index.vue';
 defineOptions({
   name: 'Map'
 })
+const layerStore = useLayerStore();
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
 const { pointLatLng, isPopuped, popupName } = storeToRefs(selectStore);
@@ -107,7 +109,11 @@ const initMap = () => {
     map.setView([32.1141, 118.93198], 11)
     map.attributionControl.remove();
     map.zoomControl.setPosition('bottomright');
-    pointStore.setMap(map);
+    if (props.isEdit) {
+      layerStore.setEditedMap(map);
+    } else {
+      pointStore.setMap(map);
+    }
     addDrawControl();
   }
 }
@@ -152,7 +158,7 @@ watch(pointLatLng, () => {
 });
 const addPopupEvents = () => {
   map.on('click', function(event) {
-    if (pointStore.editing) {
+    if (layerStore.editing) {
       return;
     }
     let clickedPoint = event.layerPoint; 
@@ -202,7 +208,7 @@ const addDrawControl = () => {
   map.addControl(drawControl);
 };
 const moveEditEvent = ()=> {
-  if (!pointStore.editing) return;
+  if (!layerStore.editing) return;
   const containerPosition = map.latLngToContainerPoint(markerLatLng);
   const { x, y } = containerPosition;
   pointStore.changePosition(x, y);
@@ -228,11 +234,11 @@ const addDrawEvents = async () => {
         const data = await boxSelectPoi(circleGeometry).then(response => response.data);
         showSearchPoi(data, drawedLayer);
       } else if (e.layerType === 'marker') {
-        if (pointStore.editing) {
+        if (layerStore.editing) {
           console.log('editing', pointStore.editing);
-          pointStore.clearEditingPoint();
+          layerStore.clearEditingPoint();
         }
-        pointStore.setEditingPoint(drawedLayer);
+        layerStore.setEditingPoint(drawedLayer);
         markerLatLng = drawedLayer.getLatLng();
         const { lng, lat } = markerLatLng;
         const containerPosition = map.latLngToContainerPoint(markerLatLng);

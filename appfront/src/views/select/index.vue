@@ -5,7 +5,7 @@
     </LeftSlide>
     <div class="map-form">
         <Map :isEdit="false"></Map>
-      <SelectForm :layers="pointLayers" @toLeft="toLeft" :class="{ left: !isHidden }"></SelectForm>
+      <SelectForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }"></SelectForm>
     </div>
   </div>
 </template>
@@ -15,18 +15,15 @@ import Map from '@/components/Map/index.vue';
 import LeftSlide from '@/components/LeftSlide.vue';
 import SelectForm from '@/components/SelectForm/index.vue';
 import SelectPanel from '@/components/SelectPanel/index.vue';
-import { computed, onMounted, ref } from 'vue';
-import { useLayerStore } from '@/stores/layer';
+import { onMounted, ref } from 'vue';
+import { useSelectStore } from '@/stores/select';
 import { storeToRefs } from 'pinia';
 defineOptions({
   name: 'Select'
 })
-const layerStore = useLayerStore();
-const { fetchLayers } = layerStore;
-const { layers } = storeToRefs(layerStore);
-const pointLayers = computed(() => {
-  return layers.value.filter(layer => layer.type === 'point');
-});
+const selectStore = useSelectStore();
+const { fetchLayers } = selectStore;
+const { layers } = storeToRefs(selectStore);
 // const layers = ref([
 //       { label: '图层0', value: 'layer0' },
 //     ]);

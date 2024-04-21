@@ -103,7 +103,7 @@ const onSubmit = async (formEl) => {
       const { locationx, locationy } = pointStore.location;
       await pointInfoSub({...form, x: locationx, y: locationy });
       emit('hide');
-      pointStore.edited();
+      layerStore.edited();
       fetchLayers();
     } else {
       console.log('error submit!', fields)
@@ -111,7 +111,7 @@ const onSubmit = async (formEl) => {
   })
 }
 const onCancel = () => {
-  pointStore.clearEditingPoint();
+  layerStore.clearEditingPoint();
   emit('hide');
 }
 </script>

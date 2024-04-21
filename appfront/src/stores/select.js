@@ -1,11 +1,17 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { usePointStore } from './point';
+import { getLayers } from '../api/api';
 export const useSelectStore = defineStore('select', () => {
   const selectedPoints = ref([]);
   const isPopuped = ref(false);
   const pointLatLng = ref(null);
   const popupName = ref('');
+  const layers = ref([]);
+  const fetchLayers = async () => {
+    const dataLayer = await getLayers().then(res => res.data);
+    layers.value = dataLayer.filter(layer => layer.type === 'point');
+  };
   function changePopupName (newName) {
     popupName.value = newName;
   }
@@ -39,5 +45,5 @@ export const useSelectStore = defineStore('select', () => {
     changePopupName(name);
     changePointLatLng({lng: x, lat: y});
   }
-  return { changePopupName, popupName, changePointLatLng, pointLatLng, selectedPoints, importSelectedPoints, panToActivePoint, isPopuped, closePopup, openPopup };
+  return { changePopupName, popupName, changePointLatLng, pointLatLng, selectedPoints, importSelectedPoints, panToActivePoint, isPopuped, closePopup, openPopup, fetchLayers, layers };
 });
