@@ -6,10 +6,10 @@
           <el-form-item label="选址范围" prop="layer">
             <el-select v-model="form.layer" placeholder="请选择选址范围" size="small">
               <el-option
-                v-for="option in layers"
-                :key="option.value"
-                :label="option.label"
-                :value="option.value">
+                v-for="layer in layers"
+                :key="layer.name"
+                :label="layer.name"
+                :value="layer.name">
               </el-option>
             </el-select>
           </el-form-item>
