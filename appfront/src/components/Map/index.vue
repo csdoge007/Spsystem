@@ -182,9 +182,10 @@ const addPopupEvents = () => {
           // 如果点击的点在标记点的范围内，则认为点击到了标记点
           console.log('click-marker', layer.options.name);
           openPopup();
-          popupName.value = layer.options.name;
+          // popupName.value = layer.options.name;
           changePopupName(layer.options.name);
-          changePointLatLng(layer.getLatLng());
+          changePointLatLng({ ...layer.getLatLng() });
+          console.log('ss', layer.getLatLng());
         }
       }
     });
