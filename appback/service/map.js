@@ -35,7 +35,7 @@ export async function readLayers () {
   try {
     pool_client = await pool.connect();
     const query = `
-    SELECT name, type, group_name, quantity FROM layer;
+    SELECT name, type, group_name,isviewed,quantity FROM layer;
     `;
     const result = await pool_client.query(query);
     
@@ -58,12 +58,12 @@ export async function readLayers () {
 export async function createLayer (layerInfo) {
   let pool_client;
   try {
-    const { name, type, group_name, quantity } = layerInfo;
+    const { name, type, group_name, quantity, isviewed } = layerInfo;
     pool_client = await pool.connect();
     const query = `
-    INSERT INTO layer (name, type, group_name, quantity) VALUES ($1, $2, $3, $4);
+    INSERT INTO layer (name, type, group_name, quantity, isviewed) VALUES ($1, $2, $3, $4, $5);
     `;
-    await pool_client.query(query, [name, type, group_name, quantity]);
+    await pool_client.query(query, [name, type, group_name, quantity, isviewed]);
   } catch (err) {
     // next(err);
     console.error(err);
@@ -99,6 +99,32 @@ export async function getElements () {
         } catch (err) {
             console.error('Error releasing pool client:', err);
         }
+    }
+  }
+}
+
+export async function changeView (name) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+    UPDATE layer
+    SET isviewed = CASE
+        WHEN isviewed = true THEN false
+        ELSE true
+      END
+    WHERE name = $1;
+    `;
+    await pool_client.query(query, [name]);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
     }
   }
 }

@@ -8,7 +8,7 @@
       ({{ quantity }})
     </span>
     <el-icon :class="{ active: isActived }" @click="changeView">
-      <template v-if="isViewed">
+      <template v-if="isviewed">
         <View />
       </template>
       <template v-else>
@@ -20,10 +20,11 @@
 
 <script setup>
 import { View, Hide } from '@element-plus/icons-vue';
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import { useLayerStore } from '@/stores/layer';
+import { updateView } from '@/api/api';
 const layerStore = useLayerStore();
-const { drawElements, clearElements } = layerStore; 
+const { drawElements, clearElements, changeLayerView } = layerStore; 
 defineOptions({
   name: 'EditItemHeader',
 });
@@ -47,19 +48,25 @@ const props = defineProps({
   isActived: {
     type: Boolean,
     required: true,
+  },
+  isviewed: {
+    type: Boolean,
+    required: true,
   }
 });
-const isViewed = ref(true);
 const changeView = (event) => {
-  isViewed.value = !isViewed.value;
+  // isViewed.value = !isViewed.value;
+  changeLayerView(props.name);
+  updateView(props.name);
   event.stopPropagation();
 }
-watch(isViewed, (newValue) => {
+watch(() => props.isviewed, (newValue) => {
   if (!props.children || props.children.length <= 0) return;
   if (newValue) {
     const { type, name, children } = props;
     drawElements({type, name, children});
   } else {
+    console.log('a');
     clearElements(props.name);
   }
 })
