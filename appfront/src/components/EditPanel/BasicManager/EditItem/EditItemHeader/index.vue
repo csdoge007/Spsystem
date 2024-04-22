@@ -66,7 +66,6 @@ watch(() => props.isviewed, (newValue) => {
     const { type, name, children } = props;
     drawElements({type, name, children});
   } else {
-    console.log('a');
     clearElements(props.name);
   }
 })
@@ -91,5 +90,8 @@ watch(() => props.isviewed, (newValue) => {
 }
 .active {
   opacity: 1;
+}
+svg {
+  margin-top: -2px;
 }
 </style>

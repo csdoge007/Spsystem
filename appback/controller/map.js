@@ -8,7 +8,6 @@ export async function getPoi(req, res, next) {
     pool_client = await pool.connect();
     const data = await pool_client.query('SELECT * FROM njpoi_2020_new');
     const pointData = convert(data.rows);
-    // console.log(pointData);
     res.status(200).send(pointData);
   } catch (err) {
     next(err);
@@ -74,14 +73,6 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer, type } = req.query;
-    // const indexQuery = `CREATE INDEX idx_type ON njpoi_2020_new (type);`;
-    // pool_client.query(indexQuery, (err, result) => {
-    //   if (err) {
-    //     console.error('Error creating index', err);
-    //     return;
-    //   }
-    //   console.log('Index created successfully');
-    // })
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS

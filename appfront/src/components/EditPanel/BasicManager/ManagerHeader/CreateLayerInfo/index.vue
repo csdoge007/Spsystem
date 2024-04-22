@@ -111,7 +111,6 @@ const onSubmit = async (formEl) => {
         group_name: form.group,
         isviewed: true,
       };
-      console.log('layerInfo', layerInfo);
       await addLayer(layerInfo);
       closeLayerDialog();
       fetchLayers();
@@ -122,7 +121,6 @@ const onSubmit = async (formEl) => {
 }
 const handleClick = (event) => {
   const className = event.currentTarget.classList[0];
-  console.log(className);
   if (className in activeSign) {
     Object.keys(activeSign).forEach((key) => {
       activeSign[key] = false;

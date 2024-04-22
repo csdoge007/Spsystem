@@ -33,7 +33,6 @@ export const useLayerStore = defineStore('layer', () => {
         drawElements({type, name, children});
       }
     }
-    console.log(layers.value);
   };
   const clearMap = () => {
     // const pointStore = usePointStore();

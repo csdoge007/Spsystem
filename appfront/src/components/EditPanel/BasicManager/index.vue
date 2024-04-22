@@ -2,12 +2,12 @@
   <div class="basic">
     <ManagerHeader></ManagerHeader>
       <el-collapse accordion @change="toggleItem">
-        <el-collapse-item v-for="(value, idx) in layers" :key="value.name" :name="idx">
+        <el-collapse-item v-for="(layer, idx) in layers" :key="layer.name" :name="idx">
           <div class="triangle"></div>
           <template #title>
-              <EditItemHeader v-bind="value" :isActived="idx === activeIdx"></EditItemHeader>
+              <EditItemHeader v-bind="layer" :isActived="idx === activeIdx"></EditItemHeader>
           </template>
-          Hello
+          <EditItemContent :elements="layer.children ? layer.children : []"></EditItemContent>
         </el-collapse-item>
       </el-collapse>
   </div>
@@ -16,6 +16,7 @@
 <script setup>
 import ManagerHeader from './ManagerHeader/index.vue';
 import EditItemHeader from './EditItem/EditItemHeader/index.vue';
+import EditItemContent from './EditItem/EditItemContent/index.vue';
 import { useLayerStore } from '@/stores/layer';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
@@ -68,5 +69,12 @@ const toggleItem = (idx) => {
 :deep(.el-collapse-item__header.is-active) {
   background-color: rgba(242,245,255,0.6);
   color: rgb(91,125,219);
+}
+:deep(.el-collapse-item__content) {
+  padding-bottom: 0;
+  margin-left: 10px;
+  margin-top: 10px;
+  color: rgb(115,127,155);
+  font-size: 15px;
 }
 </style>

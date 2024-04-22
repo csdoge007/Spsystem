@@ -1,7 +1,7 @@
 <template>
   <div class="point-items">
-    <div class="point-item" v-for="point in points" :key="point.name">
-      {{point.name}}
+    <div class="point-item" v-for="element in elements" :key="element.name">
+      {{element.title}}
     </div>
   </div>
 </template>
@@ -11,18 +11,20 @@ defineOptions({
   name: 'EditItemContent',
 });
 const props = defineProps({
-  points: {
+  elements: {
     type: Array,
     required: true,
   },
 });
+console.log(props.elements);
 </script>
 
 <style scoped>
 .point-items {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .point-item {
-  height: 20px;
+  height: 35px;
 }
 </style>
