@@ -7,7 +7,7 @@
     <span class="quantity" style="margin-left: 4px; color: rgb(172,175,189)">
       ({{ quantity }})
     </span>
-    <el-icon :class="{ active: isActived }" @click="changeView">
+    <el-icon :class="{ active: isActived || !isviewed }" @click="changeView">
       <template v-if="isviewed">
         <View />
       </template>
