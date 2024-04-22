@@ -30,7 +30,6 @@ const toggleRotation = () => {
 // const layers = ref([
 //       { label: '图层0', value: 'layer0' },
 //     ]); 
-const layers = ref([]);
 const pointStore = usePointStore();
 const hidden = ref(true);
 const infoSubmission = ref(null);

@@ -5,7 +5,9 @@
     </el-aside>
 
     <el-container>
-      <el-header>Header</el-header>
+      <el-header>
+        <Header :routeName="routeName"></Header>
+      </el-header>
       <el-main>
         <router-view v-slot="{ Component }"> 
           <keep-alive>
@@ -23,10 +25,18 @@ import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
 import { storeToRefs } from 'pinia';
 import { useDialogStore } from '@/stores/dialog.js';
+import { useRoute } from 'vue-router'
+import { ref, watch } from 'vue';
+import Header from '../Header/index.vue';
 const dialogStore = useDialogStore();
 const { layerDialog } = storeToRefs(dialogStore);
 defineOptions({
   name: 'Admin'
+});
+const route = useRoute();
+const routeName = ref(route.meta.alias);
+watch(() => route.meta.alias,(newName) => {
+  routeName.value = newName;
 });
 </script>
 

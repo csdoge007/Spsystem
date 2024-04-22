@@ -15,11 +15,13 @@ const routes = [
         path: 'select',
         component: Select,
         name: 'Select',
+        meta: { alias: '选址规划' },
       },
       {
         path: 'edit',
         component: Edit,
         name: 'Edit',
+        meta: { alias: '企业制图' },
       }
     ] 
   },

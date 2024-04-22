@@ -37,7 +37,6 @@
               :step="0.1"
               size="small"
               controls-position="right"
-              @change="handleChange"
             />
             <span>千米</span>
             <el-button type="primary"  @click="onSubmit(ruleFormRef)" :loading="loading">开始评估</el-button>
