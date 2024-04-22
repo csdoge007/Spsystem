@@ -35,7 +35,6 @@ export const useSelectStore = defineStore('select', () => {
   }
   function panToActivePoint(idx) {
     const pointStore = usePointStore();
-    console.log(selectedPoints.value[idx]);
     const { x, y, name } = selectedPoints.value[idx];
     pointStore.map.panTo([y, x]);
     if (idx >= 3) { 

@@ -46,7 +46,6 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
       html: svgTypes[i],
     });
     const { x, y, name } = newPoints[i]; 
-    console.log(x, y, name, 'zz');
     marker([y, x], { icon: svgIcon, name: name, type: 'rank' }).addTo(markers);
     if (i === 0) map.panTo([y, x]);
   }
@@ -150,7 +149,6 @@ const showPopup = () => {
 }
 const movePopupEvent = () => {
   if (!isPopuped.value) return;
-  console.log('move');
   showPopup();
 }
 watch(pointLatLng, () => {
@@ -162,12 +160,10 @@ const addPopupEvents = () => {
       return;
     }
     let clickedPoint = event.layerPoint; 
-    console.log('click', clickedPoint);
 
     // 遍历所有标记点
     map.eachLayer(function(layer) {
       if (layer instanceof Marker && layer.options.type === 'rank') {
-        // console.log('sss');
         // 获取标记点的图标大小
         let iconSize = layer.options.icon.options.iconSize;
         // 获取标记点在地图上的像素坐标
