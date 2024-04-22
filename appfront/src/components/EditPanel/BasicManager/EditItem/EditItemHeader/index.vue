@@ -42,8 +42,7 @@ const props = defineProps({
     required: true,
   },
   children: {
-    type: String,
-    required: true,
+    type: Array,
   },
   isActived: {
     type: Boolean,
