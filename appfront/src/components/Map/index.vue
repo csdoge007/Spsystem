@@ -31,8 +31,11 @@ let map = null;
 let Layer = null;
 let baseLayers = {};
 const popup = ref(null);
+const props = defineProps({
+  isEdit: Boolean,
+});
 watch(() => selectStore.selectedPoints, (newPoints) => {
-
+  if (props.isEdit) return;
   if (baseLayers['selectedLayer']) {
     map.removeLayer(baseLayers['selectedLayer']);
     baseLayers['selectedLayer'] = null;
@@ -59,9 +62,6 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
   
 });
 const input = ref('');
-const props = defineProps({
-  isEdit: Boolean,
-});
 const showSearchPoi = (data, wrappedLayer) => {
   map.eachLayer(function (layer) {
     if (layer !== Layer && layer !== baseLayers['selectedLayer']) { // 排除底图
