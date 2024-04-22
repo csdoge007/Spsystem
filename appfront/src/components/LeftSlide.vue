@@ -1,5 +1,5 @@
 <template>
-    <div class="leftSlide" :style="{ 'width': hideLeft ? '0%' : '33.333%' }">
+    <div class="leftSlide" :style="{ 'width': hideLeft ? '0%' : '33.333%' }" v-bind="$attrs">
       <div class="content" v-if="!hideLeft">
         <slot></slot>
       </div>
