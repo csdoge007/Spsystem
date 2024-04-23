@@ -8,13 +8,10 @@
 }
 
 .login-container {
-  width: 100vw;
-  height: 100vh;
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   grid-gap: 18rem;
-  padding: 0 2rem;
 }
 
 .img {
@@ -52,7 +49,7 @@
     monospace;
 }
 
-@media screen and (max-width: 1180px) {
+/* @media screen and (max-width: 1180px) {
   .login-container {
     grid-gap: 9rem;
   }
@@ -92,4 +89,4 @@
   .login-box {
     justify-content: center;
   }
-}
+} */

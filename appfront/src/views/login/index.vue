@@ -1,11 +1,11 @@
 <template>
-  <div class="select-none">
+  <div class="loginPage">
     <img :src="bg" class="wave" />
     <div class="login-container">
       <div class="login-box">
         <el-icon size="75"><LocationFilled /></el-icon>
         <h2 class="outline-none">商选易达</h2>
-        <div class="login-form">
+        <div class="login-form" v-if="currentPage === 0">
           <el-form ref="ruleFormRef" :model="ruleForm" :rules="loginRules" size="large">
             <el-form-item :rules="[
             {
@@ -21,12 +21,22 @@
                 autocomplete="new-password" @focus="clearError"/>
               <span v-if="showError" style="color: red;">密码错误，请重新输入</span>
             </el-form-item>
-            <el-button class="w-full mt-4" size="default" type="primary" :loading="loading"
-              @click="onLogin(ruleFormRef)">
+            <el-form-item>
+              <el-button class="login" size="default" type="primary" :loading="loading"
+                @click="onLogin(ruleFormRef)">
               登录
-            </el-button>
+              </el-button>
+            </el-form-item>
+            <el-form-item>
+              <div class="login-bottom">
+                <el-button>手机登录</el-button>
+                <el-button>二维码登录</el-button>
+                <el-button @click="regist">注册</el-button>
+              </div>
+            </el-form-item>
           </el-form>
         </div>
+        <LoginRegist v-if="currentPage === 1"></LoginRegist>
       </div>
     </div>
   </div>
@@ -39,11 +49,13 @@ import { ref, reactive } from "vue";
 import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
+import LoginRegist from './components/LoginRegist.vue';
 const router = useRouter();
 const showError = ref(false);
 defineOptions({
   name: "Login"
 });
+const currentPage = ref(0);
 const loading = ref(false);
 const ruleFormRef = ref();
 const ruleForm = reactive({
@@ -80,7 +92,9 @@ const onLogin = async (formEl) => {
     }
   });
 };
-
+const regist = () => {
+  currentPage.value = 1;
+};
 
 </script>
 
@@ -89,6 +103,24 @@ const onLogin = async (formEl) => {
 </style>
 
 <style lang="scss" scoped>
+.login-bottom {
+  width: 100%;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+.loginPage {
+  width: 100%;
+  height: 100%;
+}
+.el-button {
+  width: 100%;
+}
+.login {
+  width: 100%;
+}
 :deep(.el-input-group__append, .el-input-group__prepend) {
   padding: 0;
 }
@@ -97,24 +129,29 @@ const onLogin = async (formEl) => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-
+  width: 100%;
   .login-box {
-
+    display: flex;
+    flex-direction: column;
     /* 1/3宽度 */
-    margin-right: 300px;
+    position: absolute;
+    right: 200px;
     /* 推到右侧 */
     /* 添加其他样式 */
-    .outline-none {
-      position: relative;
-      top: -130px;
-      right: -220px;
-      color: rgb(153,153,153);
-    }
-    .el-icon {
-      position: relative;
-      top: -200px;
-      right: -305px;
-    }
+    // .outline-none {
+    //   position: relative;
+    //   top: -130px;
+    //   right: -220px;
+    //   color: rgb(153,153,153);
+    // }
+    // .el-icon {
+    //   position:;
+    //   top: -200px;
+    //   right: -305px;
+    // }
   }
+}
+.login-form {
+  margin-top: 30px;
 }
 </style>
