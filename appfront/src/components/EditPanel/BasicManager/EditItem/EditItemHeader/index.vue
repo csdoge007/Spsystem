@@ -54,7 +54,6 @@ const props = defineProps({
   }
 });
 const changeView = (event) => {
-  // isViewed.value = !isViewed.value;
   changeLayerView(props.name);
   updateView(props.name);
   event.stopPropagation();

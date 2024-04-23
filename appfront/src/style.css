@@ -9,3 +9,10 @@ html,body,#map, #app {
 .el-dialog {
   border-radius: 15px;
 }
+.el-popper__arrow {
+  display: none;
+}
+.popper-class {
+  right: 1000px !important;
+  inset: 59.2px 3px auto auto !important;
+}
