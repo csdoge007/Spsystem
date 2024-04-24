@@ -2,7 +2,7 @@
   <div class="basic">
     <ManagerHeader></ManagerHeader>
       <el-collapse accordion @change="toggleItem">
-        <el-collapse-item v-for="(layer, idx) in layers" :key="layer.name" :name="idx">
+        <el-collapse-item v-for="(layer, idx) in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>
           <template #title>
               <EditItemHeader v-bind="layer" :isActived="idx === activeIdx"></EditItemHeader>

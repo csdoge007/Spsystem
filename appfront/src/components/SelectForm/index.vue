@@ -52,6 +52,7 @@ import { reactive, ref } from 'vue';
 import { getAccessibility } from '@/api/api';
 import { useSelectStore } from '@/stores/select';
 const selectStore = useSelectStore();
+const { closePopup } = selectStore;
 const ruleFormRef = ref();
 defineOptions({
   name: 'SelectForm'
@@ -89,6 +90,7 @@ const onSubmit = async (formEl) => {
       console.log(result);
       selectStore.importSelectedPoints(result.data.accessibility);
       emit('toLeft');
+      closePopup();
     } else {
       loading.value = false;
       console.log('error submit!', fields)

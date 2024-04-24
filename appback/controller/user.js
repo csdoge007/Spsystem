@@ -9,6 +9,7 @@ export async function login (req, res, next) {
     const { account, password } = req.body.userInfo;
     console.log(account, password);
     const userInfo = await getUserByAccount(account);
+    console.log(userInfo);
     if(!userInfo || !userInfo.id) {
       res.status(500).send({
         msg: '账号不存在',
