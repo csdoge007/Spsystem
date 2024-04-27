@@ -128,6 +128,12 @@ export async function getAccessibility(req, res, next) {
         category: points[idx].category,
         x: points[idx].locationx,
         y: points[idx].locationy,
+        score: {
+          resident: 60,
+          competitor: 70,
+          traffic: 50,
+          rent: 40,
+        }
       }
     });
     resultSums.sort((a, b) => b.resultSums - a.resultSums);

@@ -11,7 +11,11 @@
             :category="point.category">
           </PanelItem>
         </template>
-        <component :is="activeItem === idx ? RadarChart : ''"></component>
+        <component 
+          :is="activeItem === idx ? RadarChart : ''"
+          v-bind="point.score"
+        >
+        </component>
       </el-collapse-item>
     </el-collapse>
   </div>
