@@ -78,13 +78,4 @@ img {
   display: flex;
   align-items: center;
 }
-.avatar-panel {
-  position: absolute;
-  left: 0;
-  top: 200%;
-  height: 40px;
-  width: 40px;
-  background-color: white;
-  z-index: 1000;
-}
 </style>

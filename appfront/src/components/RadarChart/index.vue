@@ -5,31 +5,15 @@
 
 <script setup>
 import { Chart } from '@antv/g2';
-import { onMounted } from 'vue';
-const props = defineProps({
-  resident: {
-    type: Number,
-    required: true,
-  },
-  competitor: {
-    type: Number,
-    required: true,
-  },
-  traffic: {
-    type: Number,
-    required: true,
-  },
-  rent: {
-    type: Number,
-    required: true,
-  }
-})
+import { onMounted, reactive } from 'vue';
+import { getScores } from '@/api/api';
+const scores = reactive({});
 const initChart = () => {
   const data = [
-    { item: '居民区' ,'分数': props.resident },
-    { item: '竞争者','分数': props.competitor },
-    { item: '交通' , '分数': props.traffic },
-    { item: '租金', '分数': props.rent },
+    { item: '居民区' ,'分数': scores.resident },
+    { item: '竞争者','分数': scores.competitor },
+    { item: '交通' , '分数': scores.traffic },
+    { item: '租金', '分数': scores.rent },
   ];
 
   const chart = new Chart({
@@ -81,7 +65,9 @@ const initChart = () => {
   chart.interaction('tooltip', { crosshairsLineDash: [4, 4] });
   chart.render();
 }
-onMounted(() => {
+onMounted(async () => {
+  const scoreVals = await getScores();
+  Object.assign(scores, scoreVals.data);
   initChart();
 });
 </script>

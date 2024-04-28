@@ -128,12 +128,6 @@ export async function getAccessibility(req, res, next) {
         category: points[idx].category,
         x: points[idx].locationx,
         y: points[idx].locationy,
-        score: {
-          resident: 60,
-          competitor: 70,
-          traffic: 50,
-          rent: 40,
-        }
       }
     });
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
@@ -144,6 +138,7 @@ export async function getAccessibility(req, res, next) {
   } catch (err) {
     console.error(err);
     next(err);
+    res.send("Error" + err);
   } finally {
     // 无论是正常结束还是异常结束，都释放数据库连接
     if (pool_client) {
