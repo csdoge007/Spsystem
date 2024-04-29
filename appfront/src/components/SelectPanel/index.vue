@@ -13,6 +13,7 @@
         </template>
         <component 
           :is="activeItem === idx ? RadarChart : ''"
+          :name="point.name"
         >
         </component>
       </el-collapse-item>
@@ -41,10 +42,10 @@ const changeActiveItem = (activeItemIndex) => {
   height: 100px;
 }
 .el-collapse {
-  height: 600px; /* 设置最大高度，以便内容超出时出现滚动条 */
+  height: 600px; 
   overflow-y: auto; 
 }
-/* :deep(.el-collapse-item__content) {
-  height: 400px;
-} */
+:deep(.el-collapse-item__content) {
+  padding-bottom: 0;
+} 
 </style>

@@ -1,6 +1,6 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
-import { circleSelectPoi, readLayers, createLayer, getElements, changeView } from "../service/map.js";
+import { circleSelectPoi, readLayers, createLayer, getElements, changeView, getRentScore, searchPoint } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -117,6 +117,7 @@ export async function getAccessibility(req, res, next) {
     const points = resultPoints.rows;
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
+      console.log('wgs', wgs84);
       return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], radius, type]);
     });
     
@@ -226,6 +227,22 @@ export async function updateView (req, res, next) {
     await changeView(name);
     console.log('name', name);
     res.status(200).send();
+  } catch (err) {
+    next(err);
+    console.error(err);
+    res.send("Error" + err);
+  }
+}
+
+export async function getScores (req, res, next) {
+  try {
+    const { name } = req.query;
+    const { locationx, locationy } = await searchPoint(name); 
+    const wgs84 = coordtransform.gcj02towgs84(locationx, locationy);
+    console.log(wgs84);
+    const rent = await getRentScore(wgs84);
+    console.log(rent);
+    res.status(200).send(rent);
   } catch (err) {
     next(err);
     console.error(err);

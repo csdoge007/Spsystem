@@ -36,7 +36,7 @@ function getGroups() {
 //   console.log(layerInfo);
 // }
 // Mock.mock('http://localhost:3000/getLayers', getLayers); 
-function getScores() {
+function getScores(name) {
   return {
     resident: 60,
     competitor: 70,
@@ -45,5 +45,5 @@ function getScores() {
   }
 };
 Mock.mock('http://localhost:3000/getGroups', getGroups);
-Mock.mock('http://localhost:3000/getScores', getScores);
+// Mock.mock('http://localhost:3000/getScores', getScores);
 // Mock.mock('http://localhost:3000/addLayer', addLayer);

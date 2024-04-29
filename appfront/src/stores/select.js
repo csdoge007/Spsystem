@@ -32,6 +32,7 @@ export const useSelectStore = defineStore('select', () => {
   }
   function importSelectedPoints(points) {
     selectedPoints.value = points;
+    console.log('points', points);
   }
   function panToActivePoint(idx) {
     const pointStore = usePointStore();

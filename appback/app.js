@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from './middleware/cors.js';
 import bodyParser from 'body-parser';
-import { getPoi, searchPoi, boxSelectPoi, getAccessibility, addPoint, getLayers, addLayer, updateView } from './controller/map.js';
+import { getPoi, searchPoi, boxSelectPoi, getAccessibility, addPoint, getLayers, addLayer, updateView, getScores } from './controller/map.js';
 import authenticateToken from './middleware/jwt.js';
 import { login } from './controller/user.js';
 const app = express();
@@ -35,6 +35,8 @@ app.get('/getLayers', authenticateToken, getLayers);
 app.post('/addLayer', authenticateToken, addLayer);
 
 app.post('/updateView', authenticateToken, updateView);
+
+app.get('/getScores', authenticateToken, getScores);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

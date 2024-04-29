@@ -7,7 +7,18 @@
 import { Chart } from '@antv/g2';
 import { onMounted, reactive } from 'vue';
 import { getScores } from '@/api/api';
-const scores = reactive({});
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  }
+})
+const scores = reactive({
+  resident: 50,
+  competitor: 50,
+  traffic: 50,
+  rent: 50,
+});
 const initChart = () => {
   const data = [
     { item: '居民区' ,'分数': scores.resident },
@@ -66,8 +77,8 @@ const initChart = () => {
   chart.render();
 }
 onMounted(async () => {
-  const scoreVals = await getScores();
-  Object.assign(scores, scoreVals.data);
+  const scoreVals = await getScores(props.name);
+  Object.assign(scores, scoreVals.val);
   initChart();
 });
 </script>

@@ -128,3 +128,70 @@ export async function changeView (name) {
     }
   }
 }
+
+async function searchDistrict (location) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const [x, y] = location;
+    const query = `
+    SELECT name
+      FROM nj
+      WHERE ST_Contains(nj.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326));
+    `;
+    const { rows } = await pool_client.query(query, [x, y]);
+    return rows[0].name;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function searchPoint (name) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+      SELECT locationx, locationy
+        FROM point
+        WHERE title = $1
+        LIMIT 1;
+    `;
+    const { rows } = await pool_client.query(query, [name]);
+    return rows[0];
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+export async function getRentScore (location) {
+  const rents = {
+    '溧水区': 100,
+    '六合区': 95,
+    '高淳区': 90,
+    '浦口区': 85,
+    '雨花台区': 80,
+    '江宁区': 75,
+    '栖霞区': 70,
+    '鼓楼区': 65,
+    '建邺区': 60,
+    '玄武区': 55,
+    '秦淮区': 50
+  };
+  const district = await searchDistrict(location);
+  return rents[district];
+}

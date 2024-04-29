@@ -14,6 +14,7 @@ const authenticateToken = (req, res, next) => {
       next();
     } catch (err) {
         res.status(401).send({msg: 'token无效或已过期'});
+        console.log(err);
         return;
     }
   } else {
