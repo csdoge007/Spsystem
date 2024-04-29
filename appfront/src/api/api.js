@@ -42,8 +42,8 @@ export const addLayer = (layerInfo) => axios.post('/addLayer', {
 export const updateView = (name) => axios.post('/updateView', {
   name,
 });
-export const getScores = (name) => axios.get('/getScores', {
+export const getScores = (pointInfo) => axios.get('/getScores', {
   params: {
-    name, 
+    ...pointInfo
   }
 });

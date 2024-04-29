@@ -14,6 +14,7 @@
         <component 
           :is="activeItem === idx ? RadarChart : ''"
           :name="point.name"
+          :radius="point.radius"
         >
         </component>
       </el-collapse-item>

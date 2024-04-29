@@ -1,6 +1,14 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
-import { circleSelectPoi, readLayers, createLayer, getElements, changeView, getRentScore, searchPoint } from "../service/map.js";
+import { 
+  circleSelectPoi, 
+  readLayers, 
+  createLayer, 
+  getElements, 
+  changeView, 
+  getRentScore, 
+  searchPoint, 
+  getResidentScore } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -73,6 +81,7 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer, type } = req.query;
+    console.log(radius);
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS
@@ -118,7 +127,7 @@ export async function getAccessibility(req, res, next) {
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
       console.log('wgs', wgs84);
-      return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], radius, type]);
+      return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], Number(radius), type]);
     });
     
     const results = await Promise.all(reachabilityQueries);
@@ -129,8 +138,10 @@ export async function getAccessibility(req, res, next) {
         category: points[idx].category,
         x: points[idx].locationx,
         y: points[idx].locationy,
+        radius: Number(radius),
       }
     });
+    console.log(typeof radius);
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
     console.log(resultSums);
     res.status(200).send({accessibility:resultSums});
@@ -236,13 +247,18 @@ export async function updateView (req, res, next) {
 
 export async function getScores (req, res, next) {
   try {
-    const { name } = req.query;
+    const { name, radius } = req.query;
     const { locationx, locationy } = await searchPoint(name); 
     const wgs84 = coordtransform.gcj02towgs84(locationx, locationy);
     console.log(wgs84);
     const rent = await getRentScore(wgs84);
-    console.log(rent);
-    res.status(200).send(rent);
+    const resident = await getResidentScore({location: wgs84, radius});
+    res.status(200).send({
+      rent,
+      resident,
+      traffic: 50,
+      competitor: 50,
+    });
   } catch (err) {
     next(err);
     console.error(err);

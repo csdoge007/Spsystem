@@ -86,6 +86,7 @@ const onSubmit = async (formEl) => {
     if (valid) {
       console.log('submit!');
       const result = await getAccessibility({...form,radius: form.radius * 1000, type: form.type});
+      console.log(typeof form.radius);
       loading.value = false;
       console.log(result);
       selectStore.importSelectedPoints(result.data.accessibility);
