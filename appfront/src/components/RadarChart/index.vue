@@ -15,6 +15,10 @@ const props = defineProps({
   radius: {
     type: Number,
     required: true,
+  },
+  category: {
+    type: String,
+    required: true,
   }
 })
 const scores = reactive({
@@ -81,7 +85,7 @@ const initChart = () => {
   chart.render();
 }
 onMounted(async () => {
-  const scoreVals = await getScores({name: props.name, radius:props.radius});
+  const scoreVals = await getScores({name: props.name, radius:props.radius, category: props.category});
   Object.assign(scores, scoreVals.data);
   console.log('score', scoreVals.data);
   initChart();

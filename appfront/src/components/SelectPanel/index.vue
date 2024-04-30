@@ -12,9 +12,11 @@
           </PanelItem>
         </template>
         <component 
-          :is="activeItem === idx ? RadarChart : ''"
+          :is="RadarChart"
+          v-if="activeItem === idx"
           :name="point.name"
           :radius="point.radius"
+          :category="point.category"
         >
         </component>
       </el-collapse-item>

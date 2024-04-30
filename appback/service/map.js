@@ -233,3 +233,43 @@ export async function getResidentScore (pointInfo) {
   console.log('score', score);
   return Math.round(score * 100) / 100;
 }
+
+async function getCompetitorQuantity (pointInfo) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { location:[x, y], radius, category } = pointInfo;
+    const query = `
+      SELECT COUNT(*) AS com_count 
+      FROM njpoi_2020_new
+      WHERE ST_DWithin(
+        njpoi_2020_new.geom::geography, 
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, 
+        $3
+      ) AND substring(type FROM '([^;]+)') = $4;
+    `;
+    const { rows } = await pool_client.query(query, [x, y, radius, category]);
+    return rows[0].com_count;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function getCompetitorScore (pointInfo) {
+  const quantity = await getCompetitorQuantity(pointInfo);
+  const { category, radius } = pointInfo;
+  const num = category === '事件活动' ? 1 : 100;
+  const density = num / 3666; 
+  const qRadius = radius / 1000;
+  const avq =  quantity / (Math.PI * Math.pow(qRadius, 2));
+  const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (avq - density)));
+  return Math.round(score * 100) / 100;
+}

@@ -8,7 +8,8 @@ import {
   changeView, 
   getRentScore, 
   searchPoint, 
-  getResidentScore } from "../service/map.js";
+  getResidentScore,
+  getCompetitorScore } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -247,17 +248,19 @@ export async function updateView (req, res, next) {
 
 export async function getScores (req, res, next) {
   try {
-    const { name, radius } = req.query;
+    const { name, radius, category } = req.query;
+    console.log('category', category);
     const { locationx, locationy } = await searchPoint(name); 
     const wgs84 = coordtransform.gcj02towgs84(locationx, locationy);
     console.log(wgs84);
     const rent = await getRentScore(wgs84);
     const resident = await getResidentScore({location: wgs84, radius});
+    const competitor = await getCompetitorScore({ location: wgs84, radius, category });
     res.status(200).send({
       rent,
       resident,
       traffic: 50,
-      competitor: 50,
+      competitor,
     });
   } catch (err) {
     next(err);
