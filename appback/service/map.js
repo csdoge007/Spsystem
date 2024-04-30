@@ -226,7 +226,7 @@ async function getResidentQuantity (pointInfo) {
 export async function getResidentScore (pointInfo) {
   const { radius } = pointInfo;
   const qRadius = radius / 1000;
-  const density = 6587 / 3666;
+  const density = 3666 / 6587;
   const quantity = await getResidentQuantity(pointInfo);
   const avq =  quantity / (Math.PI * Math.pow(qRadius, 2));
   const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (avq - density)));
@@ -267,7 +267,43 @@ export async function getCompetitorScore (pointInfo) {
   const quantity = await getCompetitorQuantity(pointInfo);
   const { category, radius } = pointInfo;
   const num = category === '事件活动' ? 1 : 100;
-  const density = num / 3666; 
+  const density = num / 6587; 
+  const qRadius = radius / 1000;
+  const avq =  quantity / (Math.PI * Math.pow(qRadius, 2));
+  const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (avq - density)));
+  return Math.round(score * 100) / 100;
+}
+
+export async function getTrafficQuantity (pointInfo) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { location:[x, y], radius } = pointInfo;
+    const query = `   
+    SELECT COUNT(*) AS com_count
+    FROM traffic
+    WHERE (fclass='trunk'  OR fclass='primary') AND ST_DWithin(traffic.geom, 
+      ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3);
+    `;
+    const { rows } = await pool_client.query(query, [x, y, radius]);
+    return rows[0].com_count;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function getTrafficScore (pointInfo) {
+  const { radius } = pointInfo;
+  const density = 3437 / 6587;
+  const quantity = await getTrafficQuantity(pointInfo);
   const qRadius = radius / 1000;
   const avq =  quantity / (Math.PI * Math.pow(qRadius, 2));
   const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (avq - density)));

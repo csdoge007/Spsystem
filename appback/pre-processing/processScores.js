@@ -57,5 +57,205 @@ async function solveCompetitor() {
   }
 }
 
+async function solveTraffic() {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+      SELECT DISTINCT fclass
+      FROM traffic;
+    `;
+    const result = await pool_client.query(query);
+    console.log(result.rows.length, result.rows);
+    
+    const streetClass = {
+      'footway': 1,
+      'cycleway': 1,
+      'track': 1,
+      'path': 1,
+      'bridleway': 1,
+      'steps': 1,
+      'unclassified': 1,
+      'unknown': 1,
+      'residential': 3,
+      'living_street': 3,
+      'primary': 5,
+      'secondary': 5,
+      'tertiary': 5,
+      'motorway': 7,
+      'trunk': 7,
+      'motorway_link': 7,
+      'trunk_link': 7,
+      'primary_link': 7,
+      'secondary_link': 7,
+      'tertiary_link': 7,
+    };
+    const query2 = `
+      SELECT COUNT(*) AS count
+      FROM traffic WHERE fclass = $1;
+    `;
+    const queryArr = Object.keys(streetClass).map(type => {
+      return pool_client.query(query2, [type]);
+    });
+    const results = await Promise.all(queryArr);
+    console.log(results.map(item => item.rows[0].count));
+    const quantitys = [
+      '4617', '328',  '326',       
+      '662',  '3',    '393',       
+      '3189', '52',   '5068',      
+      '905',  '1993', '2938',      
+      '5012', '1419', '1444',      
+      '1314', '888',  '378',       
+      '291',  '368',
+    ];
+    const streetQuantitys = {
+      footway: '4617',
+      cycleway: '328',
+      track: '326',
+      path: '662',
+      bridleway: '3',
+      steps: '393',
+      unclassified: '3189',        
+      unknown: '52',
+      residential: '5068',
+      living_street: '905',        
+      primary: '1993',
+      secondary: '2938',
+      tertiary: '5012',
+      motorway: '1419',
+      trunk: '1444',
+      motorway_link: '1314',       
+      trunk_link: '888',
+      primary_link: '378',
+      secondary_link: '291',       
+      tertiary_link: '368',
+    };
+    Object.keys(streetClass).forEach((type,idx) => {
+      streetQuantitys[type] = quantitys[idx];
+    });
+    console.log(streetQuantitys);
+  }catch (err) {
+    // next(err);
+    console.error(err);
+  } finally {
+    // 无论是正常结束还是异常结束，都释放数据库连接
+    if (pool_client) {
+        try {
+            pool_client.release(); // 释放数据库连接
+        } catch (err) {
+            console.error('Error releasing pool client:', err);
+        }
+    }
+  }
+}
+
+function calTraffic() {
+  const streetQuantitys = {
+    footway: '4617',
+    cycleway: '328',
+    track: '326',
+    path: '662',
+    bridleway: '3',
+    steps: '393',
+    unclassified: '3189',        
+    unknown: '52',
+    residential: '5068',
+    living_street: '905',        
+    primary: '1993',
+    secondary: '2938',
+    tertiary: '5012',
+    motorway: '1419',
+    trunk: '1444',
+    motorway_link: '1314',       
+    trunk_link: '888',
+    primary_link: '378',
+    secondary_link: '291',       
+    tertiary_link: '368',
+  };
+  const streetDensity = {
+    footway: 0.7009260664946106, 
+    cycleway: 0.049795050857750114,
+    track: 0.0494914224988614,   
+    path: 0.10050098679216639,   
+    bridleway: 0.0004554425383330803,
+    steps: 0.05966297252163352,  
+    unclassified: 0.4841354182480644,
+    unknown: 0.007894337331106725,
+    residential: 0.769394261424017,
+    living_street: 0.1373918323971459,
+    primary: 0.3025656596326097, 
+    secondary: 0.44603005920752997,
+    tertiary: 0.7608926673751328,
+    motorway: 0.21542432063154698,
+    trunk: 0.219219675117656,    
+    motorway_link: 0.19948383178988918,
+    trunk_link: 0.13481099134659177,
+    primary_link: 0.057385759829968117,
+    secondary_link: 0.04417792621830879,
+    tertiary_link: 0.055867618035524515,
+  };
+  // Object.keys(streetQuantitys).forEach(type => {
+  //   streetDensity[type] = parseInt(streetQuantitys[type]) / 6587;
+  // })
+  const streetClass = {
+    'footway': 1,
+    'cycleway': 1,
+    'track': 1,
+    'path': 1,
+    'bridleway': 1,
+    'steps': 1,
+    'unclassified': 1,
+    'unknown': 1,
+    'residential': 3,
+    'living_street': 3,
+    'primary': 5,
+    'secondary': 5,
+    'tertiary': 5,
+    'motorway': 7,
+    'trunk': 7,
+    'motorway_link': 7,
+    'trunk_link': 7,
+    'primary_link': 7,
+    'secondary_link': 7,
+    'tertiary_link': 7,
+  };
+  const density = Object.keys(streetClass).reduce((prev, cur) => {
+    return prev + streetClass[cur] * streetDensity[cur];
+  }, 0);
+  console.log(density);
+  return density; //18.20525277060878
+  // console.log(streetDensity);
+}
+
+async function traffic() {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+    SELECT COUNT(*) AS count
+    FROM traffic
+    WHERE fclass='trunk' OR fclass='primary';
+    `;
+    const { rows } = await pool_client.query(query);
+    console.log('qu', rows[0].count);
+  } catch (err) {
+    // next(err);
+    console.error(err);
+  } finally {
+    // 无论是正常结束还是异常结束，都释放数据库连接
+    if (pool_client) {
+        try {
+            pool_client.release(); // 释放数据库连接
+        } catch (err) {
+            console.error('Error releasing pool client:', err);
+        }
+    }
+  }
+}
+
+
 solveRent();
-await solveCompetitor();
+// await solveCompetitor();
+// await solveTraffic();
+calTraffic();
+await traffic();

@@ -9,7 +9,8 @@ import {
   getRentScore, 
   searchPoint, 
   getResidentScore,
-  getCompetitorScore } from "../service/map.js";
+  getCompetitorScore,
+  getTrafficScore } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -82,7 +83,6 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer, type } = req.query;
-    console.log(radius);
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS
@@ -120,14 +120,12 @@ export async function getAccessibility(req, res, next) {
         return;
       }
       // 创建函数成功
-      console.log('Function created successfully');
     });
     // 查询layer名为layer的点
     const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1 And category = $2', [layer, type]);
     const points = resultPoints.rows;
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
-      console.log('wgs', wgs84);
       return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], Number(radius), type]);
     });
     
@@ -142,9 +140,7 @@ export async function getAccessibility(req, res, next) {
         radius: Number(radius),
       }
     });
-    console.log(typeof radius);
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
-    console.log(resultSums);
     res.status(200).send({accessibility:resultSums});
   
     // res.status(200).send(mallPois.rows);
@@ -169,7 +165,6 @@ export async function addPoint(req, res, next) {
   let pool_client;
   try {
     const { pointInfo } = req.body;
-    console.log(pointInfo);
     const { layer, title, description, address, x, y, category } = pointInfo;
     const locationx = parseFloat(x);
     const locationy = parseFloat(y);
@@ -202,7 +197,6 @@ export async function addPoint(req, res, next) {
 export async function getLayers(req, res, next) {
   try {
     const layers = await readLayers();
-    console.log(layers);
     const layerMap = new Map();
     for (const layer of layers) {
       layerMap[layer.name] = layer;
@@ -225,7 +219,6 @@ export async function addLayer (req, res, next) {
   try {
     const { layerInfo } = req.body;
     await createLayer(layerInfo);
-    // console.log(layerInfo);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -237,7 +230,6 @@ export async function updateView (req, res, next) {
   try {
     const { name } = req.body;
     await changeView(name);
-    console.log('name', name);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -249,17 +241,20 @@ export async function updateView (req, res, next) {
 export async function getScores (req, res, next) {
   try {
     const { name, radius, category } = req.query;
-    console.log('category', category);
     const { locationx, locationy } = await searchPoint(name); 
     const wgs84 = coordtransform.gcj02towgs84(locationx, locationy);
-    console.log(wgs84);
-    const rent = await getRentScore(wgs84);
-    const resident = await getResidentScore({location: wgs84, radius});
-    const competitor = await getCompetitorScore({ location: wgs84, radius, category });
+    const promiseArr = [
+      getRentScore(wgs84),
+      getResidentScore({location: wgs84, radius}),
+      getCompetitorScore({ location: wgs84, radius, category }),
+      getTrafficScore({location: wgs84, radius}),
+    ];
+    const results = await Promise.all(promiseArr);
+    const [rent, resident, competitor, traffic] = results;
     res.status(200).send({
       rent,
       resident,
-      traffic: 50,
+      traffic,
       competitor,
     });
   } catch (err) {

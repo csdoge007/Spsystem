@@ -76,7 +76,6 @@ async function countByType () {
     results.forEach((result,idx) => {
       typeRes[types[idx]] = result.rows[0].count;
     });
-    console.log(typeRes);
     return typeRes;
   }catch (err) {
     // next(err);
