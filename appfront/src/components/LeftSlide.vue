@@ -51,4 +51,7 @@ const toggleRotation = () => {
 .rotate {
   transform: rotate(180deg);
 }
+.content {
+  height: 100%;
+}
 </style>

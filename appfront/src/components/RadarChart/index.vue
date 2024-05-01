@@ -1,12 +1,22 @@
 <template>
-  <div id="radar">
+  <div class="radar-container">
+    <div class="radar-left">
+      <div class="title">| 选址评分雷达图</div>
+      <div id="radar"></div>
+    </div>
+    <RatePanel v-if="viewRated" v-bind="scores"></RatePanel>
   </div>
 </template>
 
 <script setup>
 import { Chart } from '@antv/g2';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { getScores } from '@/api/api';
+import { ElLoading } from 'element-plus'
+import RatePanel from './RatePanel/index.vue';
+defineOptions({
+  name: 'RadarChart',
+});
 const props = defineProps({
   name: {
     type: String,
@@ -20,7 +30,8 @@ const props = defineProps({
     type: String,
     required: true,
   }
-})
+});
+const viewRated = ref(false);
 const scores = reactive({
   resident: 50,
   competitor: 50,
@@ -38,8 +49,8 @@ const initChart = () => {
   const chart = new Chart({
     container: 'radar',
     autoFit: true,
-    width: 300,
-    height: 300
+    width: 220,
+    height: 230
   });
 
   chart.coordinate({ type: 'polar' });
@@ -80,20 +91,42 @@ const initChart = () => {
     .encode('shape', 'point')
     .encode('size', 3)
     .tooltip(null);
-
+  
   chart.interaction('tooltip', { crosshairsLineDash: [4, 4] });
   chart.render();
 }
 onMounted(async () => {
+  const loadingInstance = ElLoading.service({ target: '#radar', background:'#f6f6f6' });
   const scoreVals = await getScores({name: props.name, radius:props.radius, category: props.category});
   Object.assign(scores, scoreVals.data);
   console.log('score', scoreVals.data);
   initChart();
+  loadingInstance.close();
+  viewRated.value = true;
 });
 </script>
 
 <style lang="scss" scoped>
-#radar {
-  width: 300px; 
+.radar-container {
+  width: 100%;
+  background-color: rgb(246,246,246);
+  position: relative;
+  display: flex;
+  .radar-left {
+    display: flex;
+    flex-direction: column;
+    #radar {
+      width: 220px; 
+      height: 230px;
+    }
+    .title {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      color: rgb(79,92,143);
+      height: 20px;
+    }
+  }
+
 }
 </style>
