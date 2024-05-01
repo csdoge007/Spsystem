@@ -34,12 +34,13 @@ const props = defineProps({
 <style lang="scss" scoped>
 .rate-panel {
   list-style-type: none; 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   display: flex;
   flex-direction: column;
   justify-content: space-between; 
-  padding-left: 10px;
+  // margin-left: -10px;
+  padding-left:0;
   position: relative;
   top: 50px;
   height: 150px;

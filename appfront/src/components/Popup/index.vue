@@ -26,7 +26,7 @@ const close = () => {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, calc(-100% - 20px));
+  transform: translate(-50%, calc(-100% - 35px));
   z-index: 1000;
   background-color: white;
   padding: 15px;
@@ -41,7 +41,7 @@ const close = () => {
   border-top-color:white;
   position: absolute;
   left: 50%;
-  top: 99%;
+  top: 95%;
   transform: translate(-50%);
 }
 .close {

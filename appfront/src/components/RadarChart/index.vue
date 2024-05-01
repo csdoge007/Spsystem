@@ -49,7 +49,7 @@ const initChart = () => {
   const chart = new Chart({
     container: 'radar',
     autoFit: true,
-    width: 220,
+    width: 285,
     height: 230
   });
 
@@ -91,8 +91,18 @@ const initChart = () => {
     .encode('shape', 'point')
     .encode('size', 3)
     .tooltip(null);
-  
-  chart.interaction('tooltip', { crosshairsLineDash: [4, 4] });
+  chart.interaction('tooltip', { 
+    crosshairsLineDash: [4, 4],
+    // render: (event, { title, items }) => {
+    //   return `<div style="display: flex; justify-content: center">
+    //   <h3 style="padding:0;margin:0">${title}</h3>
+    //   ${items.map(
+    //     (d) =>
+    //       `<span style="color: ${d.color}">${d.name}</span> ${d.value}`,
+    //   )}
+    //   </div>`;
+    // }
+  });
   chart.render();
 }
 onMounted(async () => {
@@ -116,7 +126,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     #radar {
-      width: 220px; 
+      width: 285px; 
       height: 230px;
     }
     .title {
@@ -124,7 +134,7 @@ onMounted(async () => {
       font-weight: bold;
       font-size: 15px;
       color: rgb(79,92,143);
-      height: 20px;
+      height: 25px;
     }
   }
 

@@ -43,20 +43,18 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
 
   const markers = layerGroup();
   baseLayers['selectedLayer'] = markers;
-  for (let i = 0; i < 3 && i < newPoints.length; i++) {
-    let svgIcon = divIcon({
-      className: 'custom-svg-icon',
-      html: svgTypes[i],
-    });
+  for (let i = 0; i < newPoints.length; i++) {
     const { x, y, name } = newPoints[i]; 
-    marker([y, x], { icon: svgIcon, name: name, type: 'rank' }).addTo(markers);
+    if (i < 3) {
+      let svgIcon = divIcon({
+        className: 'custom-svg-icon',
+        html: svgTypes[i],
+      });
+      marker([y, x], { icon: svgIcon, name, type: 'rank' }).addTo(markers);
+    } else {
+      marker([y, x], { name, type: 'rank' }).addTo(markers);
+    }
     if (i === 0) map.panTo([y, x]);
-  }
-  for (let i = 3; i < newPoints.length; i++) {
-    const { x, y, name } = newPoints[i]; 
-    let markerLayer = marker([y, x]).addTo(markers);
-    markerLayer.bindPopup(name);
-    markerLayer.openPopup();
   }
   map.addLayer(markers);
   

@@ -4,7 +4,7 @@
       <SelectPanel></SelectPanel>
     </LeftSlide>
     <div class="map-form">
-        <Map :isEdit="false"></Map>
+      <Map :isEdit="false"></Map>
       <SelectForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }"></SelectForm>
     </div>
   </div>

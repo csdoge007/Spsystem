@@ -1,5 +1,5 @@
 <template>
-    <div class="leftSlide" :style="{ 'width': hideLeft ? '0%' : '33.333%' }" v-bind="$attrs">
+    <div class="leftSlide" :style="{ 'width': hideLeft ? '0%' : '40%' }" v-bind="$attrs">
       <div class="content" v-if="!hideLeft">
         <slot></slot>
       </div>
@@ -46,7 +46,7 @@ const toggleRotation = () => {
   color: white;
 }
 .left {
-  left: 25%;
+  left: 28.57143%;
 }
 .rotate {
   transform: rotate(180deg);
