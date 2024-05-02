@@ -69,5 +69,5 @@ export const useLayerStore = defineStore('layer', () => {
     const layer = layers.value.filter(layer => layer.name === name)[0];
     layer.isviewed = !layer.isviewed;
   }
-  return { editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
+  return { map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
 });

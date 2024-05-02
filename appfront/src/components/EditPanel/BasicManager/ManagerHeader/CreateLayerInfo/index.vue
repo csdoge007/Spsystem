@@ -4,9 +4,9 @@
     v-model="layerDialog"
     >
     <template #header="{ titleId, titleClass }">
-      <h7 :id="titleId" :class="titleClass" style="font-weight: bold;">
+      <span :id="titleId" :class="titleClass" style="font-weight: bold;">
         新建图层
-      </h7>
+      </span>
     </template>
     <div class="parting-line"></div>
     <span class="text">请选择图层类型</span>

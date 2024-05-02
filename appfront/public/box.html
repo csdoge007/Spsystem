@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商选易达</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+    html,body{
+      height: 100%;
+      margin: 0;
+    }
+    .box {
+      background-color: blue;
+      height: 800px;
+      width: 30%;
+      padding: 20px;
+    }
+    .content {
+      width: 100%;
+      padding-bottom: 75%;
+      background-color: red;
+      position: relative;
+    }
+    .video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%; /* 宽度和 .content 相同 */
+      height: 100%; /* 高度和 .content 相同，根据 .content 的宽度计算 */
+      background-color: green; /* 测试用，显示 .video 的区域 */
+    }
+    </style>
+
+  </head>
+  <body>
+    <div class="box">
+      <div class="content">
+        <div class="video"></div>
+      </div>
+    </div>
+  </body>
+</html>

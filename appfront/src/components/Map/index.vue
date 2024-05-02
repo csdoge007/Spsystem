@@ -34,6 +34,14 @@ const popup = ref(null);
 const props = defineProps({
   isEdit: Boolean,
 });
+L.Popup.prototype._animateZoom = function (e) {
+  if (!this._map) {
+    return
+  }
+  let pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
+    anchor = this._getAnchor()
+  L.DomUtil.setPosition(this._container, pos.add(anchor))
+}
 watch(() => selectStore.selectedPoints, (newPoints) => {
   if (props.isEdit) return;
   if (baseLayers['selectedLayer']) {
@@ -62,8 +70,14 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
 const input = ref('');
 const showSearchPoi = (data, wrappedLayer) => {
   map.eachLayer(function (layer) {
-    if (layer !== Layer && layer !== baseLayers['selectedLayer']) { // 排除底图
-      map.removeLayer(layer);
+    if (!props.isEdit) {
+      if (layer !== Layer && layer !== baseLayers['selectedLayer']) { 
+        map.removeLayer(layer);
+      }
+    } else {
+      if (layer.options.type === 'proto') {
+        map.removeLayer(layer);
+      }
     }
   });
   if (wrappedLayer) map.addLayer(wrappedLayer);
@@ -123,7 +137,7 @@ const buildLayerTree = (data) => {
         className: 'custom-svg-icon',
         html: svgTypes[type],
       });
-      let markerLayer = marker([locationy, locationx], { icon: svgIcon}).addTo(markersLayer);
+      let markerLayer = marker([locationy, locationx], { icon: svgIcon, type: 'proto'}).addTo(markersLayer);
       markerLayer.bindPopup(poi.name);
       markerLayer.openPopup();
     })
@@ -138,7 +152,7 @@ const showPopup = () => {
   const containerPosition = map.latLngToContainerPoint(pointLatLng.value);
   const { x, y } = containerPosition;
   nextTick(() => {
-    const infoEl = popup.value.$el;
+    const infoEl = popup.value?.$el;
     if (infoEl) {
       infoEl.style.left = `${x}px`;
       infoEl.style.top = `${y}px`;
