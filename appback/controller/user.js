@@ -31,6 +31,7 @@ export async function login (req, res, next) {
       {
         id: userInfo._id,
         account: userInfo.account,
+        corporation: userInfo.corporation,
       },
       secretKey,
       {

@@ -11,6 +11,7 @@ const authenticateToken = (req, res, next) => {
     try {
       decode = jwt.verify(token, secretKey);
       req.id = decode.id;
+      req.corporation = decode.corporation;
       next();
     } catch (err) {
         res.status(401).send({msg: 'token无效或已过期'});

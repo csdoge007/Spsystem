@@ -84,6 +84,7 @@ export async function getAccessibility(req, res, next) {
   try {
     pool_client = await pool.connect();
     const { radius, layer, type } = req.query;
+    const { corporation } = req;
     const createFunctionQuery = `
       CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
       RETURNS double precision AS
@@ -123,7 +124,7 @@ export async function getAccessibility(req, res, next) {
       // 创建函数成功
     });
     // 查询layer名为layer的点
-    const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1 And category = $2', [layer, type]);
+    const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1 And category = $2 And corporation = $3', [layer, type, corporation]);
     const points = resultPoints.rows;
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
@@ -166,18 +167,19 @@ export async function addPoint(req, res, next) {
   let pool_client;
   try {
     const { pointInfo } = req.body;
+    const { corporation } = req;
     const { layer, title, description, address, x, y, category } = pointInfo;
     const locationx = parseFloat(x);
     const locationy = parseFloat(y);
     pool_client = await pool.connect();
     const insertSql = `
-    INSERT INTO point (title, layer, locationx, locationy, description, address, category) VALUES ($1, $2, $3, $4, $5, $6, $7);
+    INSERT INTO point (title, layer, locationx, locationy, description, address, category, corporation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
     `;
     const updateSql = `
-    UPDATE layer SET quantity = quantity + 1 WHERE name = $1;
+    UPDATE layer SET quantity = quantity + 1 WHERE name = $1 And corporation = $2;
     `
-    await pool_client.query(insertSql, [title, layer, locationx, locationy, description, address, category]);
-    await pool_client.query(updateSql, [layer]);
+    await pool_client.query(insertSql, [title, layer, locationx, locationy, description, address, category, corporation]);
+    await pool_client.query(updateSql, [layer, corporation]);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -198,12 +200,13 @@ export async function addPoint(req, res, next) {
 export async function getLayers(req, res, next) {
   try {
     const layers = await readLayers();
+    const { corporation } = req;
     const layerMap = new Map();
     for (const layer of layers) {
       layerMap[layer.name] = layer;
     }
     // 获取点、线、面三要素
-    const elements = await getElements();
+    const elements = await getElements(corporation);
     for (const element of elements) {
       const layer = layerMap[element.layer];
       layer.children = layer.children ? [...layer.children, element] : [element];
@@ -219,7 +222,8 @@ export async function getLayers(req, res, next) {
 export async function addLayer (req, res, next) {
   try {
     const { layerInfo } = req.body;
-    await createLayer(layerInfo);
+    const { corporation } = req;
+    await createLayer({ corporation, ...layerInfo});
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -230,7 +234,8 @@ export async function addLayer (req, res, next) {
 export async function updateView (req, res, next) {
   try {
     const { name } = req.body;
-    await changeView(name);
+    const { corporation } = req;
+    await changeView(name, corporation);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -242,7 +247,8 @@ export async function updateView (req, res, next) {
 export async function getScores (req, res, next) {
   try {
     const { name, radius, category } = req.query;
-    const { locationx, locationy } = await searchPoint(name); 
+    const { corporation } = req;
+    const { locationx, locationy } = await searchPoint(name, corporation); 
     const wgs84 = coordtransform.gcj02towgs84(locationx, locationy);
     const promiseArr = [
       getRentScore(wgs84),
@@ -268,7 +274,8 @@ export async function getScores (req, res, next) {
 export async function deleteLayer (req, res, next) {
   try {
     const { layerName } = req.query;
-    await deleteEditLayer(layerName);
+    const { corporation } = req;
+    await deleteEditLayer(layerName, corporation);
     res.status(200).send();
   } catch (error) {
     console.error(err);

@@ -58,12 +58,12 @@ export async function readLayers () {
 export async function createLayer (layerInfo) {
   let pool_client;
   try {
-    const { name, type, group_name, quantity, isviewed } = layerInfo;
+    const { name, type, group_name, quantity, isviewed, corporation } = layerInfo;
     pool_client = await pool.connect();
     const query = `
-    INSERT INTO layer (name, type, group_name, quantity, isviewed) VALUES ($1, $2, $3, $4, $5);
+    INSERT INTO layer (name, type, group_name, quantity, isviewed, corporation) VALUES ($1, $2, $3, $4, $5, $6);
     `;
-    await pool_client.query(query, [name, type, group_name, quantity, isviewed]);
+    await pool_client.query(query, [name, type, group_name, quantity, isviewed, corporation]);
   } catch (err) {
     // next(err);
     console.error(err);
@@ -79,14 +79,14 @@ export async function createLayer (layerInfo) {
   }
 }
 
-export async function getElements () {
+export async function getElements (corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
     const query = `
-    SELECT * FROM point;
+    SELECT * FROM point WHERE corporation=$1;
     `;
-    const result = await pool_client.query(query);
+    const result = await pool_client.query(query, [corporation]);
     return result.rows;
   } catch (err) {
     // next(err);
@@ -103,7 +103,7 @@ export async function getElements () {
   }
 }
 
-export async function changeView (name) {
+export async function changeView (name, corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
@@ -113,9 +113,9 @@ export async function changeView (name) {
         WHEN isviewed = true THEN false
         ELSE true
       END
-    WHERE name = $1;
+    WHERE name = $1 And corporation = $2;
     `;
-    await pool_client.query(query, [name]);
+    await pool_client.query(query, [name, corporation]);
   } catch (err) {
     console.error(err);
   } finally {
@@ -154,17 +154,17 @@ async function searchDistrict (location) {
   }
 }
 
-export async function searchPoint (name) {
+export async function searchPoint (name, corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
     const query = `
       SELECT locationx, locationy
         FROM point
-        WHERE title = $1
+        WHERE title = $1 And corporation = $2
         LIMIT 1;
     `;
-    const { rows } = await pool_client.query(query, [name]);
+    const { rows } = await pool_client.query(query, [name, corporation]);
     return rows[0];
   } catch (err) {
     console.error(err);
@@ -310,12 +310,12 @@ export async function getTrafficScore (pointInfo) {
   return Math.round(score * 100) / 100;
 }
 
-export async function deleteEditLayer (layerName) {
+export async function deleteEditLayer (layerName, corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
-    const query = `DELETE FROM layer WHERE name=$1;`;
-    await pool_client.query(query, [layerName]);
+    const query = `DELETE FROM layer WHERE name=$1 And corporation=$2;`;
+    await pool_client.query(query, [layerName, corporation]);
   } catch (err) {
     console.error(err);
   } finally {

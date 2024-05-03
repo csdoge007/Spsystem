@@ -16,3 +16,7 @@ html,body,#map, #app {
   right: 1000px !important;
   inset: 59.2px 3px auto auto !important;
 }
+
+svg {
+	outline: none;
+}
