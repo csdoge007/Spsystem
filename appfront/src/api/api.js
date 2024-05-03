@@ -47,3 +47,9 @@ export const getScores = (pointInfo) => axios.get('/getScores', {
     ...pointInfo
   }
 });
+
+export const deleteLayer = (layerName) => axios.delete('/deleteLayer', {
+  params: {
+    layerName,
+  }
+});

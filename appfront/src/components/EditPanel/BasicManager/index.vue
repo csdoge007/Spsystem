@@ -5,7 +5,7 @@
         <el-collapse-item v-for="(layer, idx) in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>
           <template #title>
-              <EditItemHeader v-bind="layer" :isActived="idx === activeIdx"></EditItemHeader>
+            <EditItemHeader v-bind="layer" :isActived="idx === activeIdx"></EditItemHeader>
           </template>
           <EditItemContent :elements="layer.children ? layer.children : []"></EditItemContent>
         </el-collapse-item>
