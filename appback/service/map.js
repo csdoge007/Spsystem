@@ -35,7 +35,7 @@ export async function readLayers () {
   try {
     pool_client = await pool.connect();
     const query = `
-    SELECT name, type, group_name,isviewed,quantity FROM layer;
+    SELECT id, name, type, group_name,isviewed,quantity FROM layer;
     `;
     const result = await pool_client.query(query);
     
