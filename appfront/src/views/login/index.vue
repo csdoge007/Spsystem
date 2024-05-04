@@ -14,11 +14,11 @@
               trigger: 'blur'
             }
           ]" prop="account">
-              <el-input v-model="ruleForm.account" clearable placeholder="账号" autocomplete="new-password" />
+              <el-input v-model="ruleForm.account" clearable placeholder="账号" :prefix-icon="User"/>
             </el-form-item>
             <el-form-item prop="password">
               <el-input v-model="ruleForm.password" clearable show-password placeholder="密码"
-                autocomplete="new-password" @focus="clearError"/>
+                autocomplete="new-password" @focus="clearError" :prefix-icon="Lock"/>
               <span v-if="showError" style="color: red;">密码错误，请重新输入</span>
             </el-form-item>
             <el-form-item>
@@ -43,24 +43,27 @@
 </template>
 
 <script setup>
-import { LocationFilled } from '@element-plus/icons-vue'
+import { LocationFilled, User, Lock } from '@element-plus/icons-vue'
 import { loginRules } from "./utils/rule";
 import { ref, reactive } from "vue";
 import { bg } from "./utils/static.js";
 import { login } from '@/api/api.js';
 import { useRouter } from 'vue-router';
 import LoginRegist from './components/LoginRegist.vue';
-const router = useRouter();
-const showError = ref(false);
+import { useLoginStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 defineOptions({
   name: "Login"
 });
-const currentPage = ref(0);
+const router = useRouter();
+const showError = ref(false);
+const loginStore = useLoginStore();
+const { currentPage } = storeToRefs(loginStore);
 const loading = ref(false);
 const ruleFormRef = ref();
 const ruleForm = reactive({
   account: "",
-  password: ""
+  password: "",
 });
 const clearError = () => {
   showError.value = false;
