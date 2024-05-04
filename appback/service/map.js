@@ -328,3 +328,24 @@ export async function deleteEditLayer (layerName, corporation) {
     }
   }
 } 
+
+export async function updateLayerName (layerInfo, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { name, id } = layerInfo;
+    const query = `UPDATE layer SET name = $1 WHERE id = $2 AND corporation = $3`;
+    await pool_client.query(query, [name, id, corporation]);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+

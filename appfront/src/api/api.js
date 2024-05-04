@@ -53,3 +53,7 @@ export const deleteLayer = (layerName) => axios.delete('/deleteLayer', {
     layerName,
   }
 });
+
+export const reLayerName = (layerInfo) => axios.put('/reLayerName', {
+  layerInfo,
+});

@@ -18,6 +18,7 @@
         </template>
         <template #dropdown>
           <el-dropdown-menu>
+            <el-dropdown-item command="u">重命名</el-dropdown-item>
             <el-dropdown-item command="d">删除图层</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -30,12 +31,15 @@
 import { View, Hide } from '@element-plus/icons-vue';
 import { watch, ref } from 'vue';
 import { useLayerStore } from '@/stores/layer';
+import { useDialogStore } from '@/stores/dialog'; 
 import { updateView, deleteLayer } from '@/api/api';
-const layerStore = useLayerStore();
-const { drawElements, clearElements, changeLayerView, fetchLayers } = layerStore; 
 defineOptions({
   name: 'EditItemHeader',
 });
+const layerStore = useLayerStore();
+const dialogStore = useDialogStore();
+const { drawElements, clearElements, changeLayerView, fetchLayers } = layerStore; 
+const { openReNameDialog, changeReNameId } = dialogStore;
 const dropdown = ref();
 const props = defineProps({
   type: {
@@ -59,6 +63,10 @@ const props = defineProps({
   },
   isviewed: {
     type: Boolean,
+    required: true,
+  },
+  id: {
+    type: Number,
     required: true,
   }
 });
@@ -85,6 +93,9 @@ const handleCommand = async (commandItem) => {
   if (commandItem === 'd') {
     await deleteLayer(props.name);
     fetchLayers();
+  } else if (commandItem === 'u') {
+    changeReNameId(props.id);
+    openReNameDialog();
   }
 };
 </script>

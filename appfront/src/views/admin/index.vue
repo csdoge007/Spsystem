@@ -18,18 +18,20 @@
     </el-container>
   </el-container>
   <LayerInfo v-if="layerDialog"></LayerInfo>
+  <ReNameInfo v-if="reNameDialog" :layerId="reNameId"></ReNameInfo>
 </template>
 
 <script setup>
 import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
+import ReNameInfo from '@/components/EditPanel/BasicManager/EditItem/EditItemHeader/ReNameInfo/index.vue';
 import { storeToRefs } from 'pinia';
 import { useDialogStore } from '@/stores/dialog.js';
 import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue';
 import Header from '../Header/index.vue';
 const dialogStore = useDialogStore();
-const { layerDialog } = storeToRefs(dialogStore);
+const { reNameId, layerDialog, reNameDialog } = storeToRefs(dialogStore);
 defineOptions({
   name: 'Admin'
 });

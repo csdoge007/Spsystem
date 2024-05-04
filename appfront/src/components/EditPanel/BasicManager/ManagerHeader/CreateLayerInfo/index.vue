@@ -49,7 +49,7 @@
       </el-form-item>
       <el-form-item class="flex-container">
         <el-button @click="onCancel">取消</el-button>
-        <el-button type="primary" @click="onSubmit(ruleFormRef)" :loading="loading">保存</el-button>
+        <el-button type="primary" @click="onSubmit(ruleFormRef)">保存</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -59,22 +59,21 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { getGroups, addLayer } from '@/api/api';
 import { ElMessage } from 'element-plus';
-defineOptions({
-  name: 'LayerInfo'
-})
 import { storeToRefs } from 'pinia';
 import { useDialogStore } from '@/stores/dialog.js';
 import { useLayerStore } from '@/stores/layer.js';
+defineOptions({
+  name: 'LayerInfo'
+})
 const dialogStore = useDialogStore();
 const layerStore = useLayerStore();
 const { layerDialog } = storeToRefs(dialogStore);
 const { closeLayerDialog } = dialogStore;
 const { fetchLayers } = layerStore;
 const ruleFormRef = ref();
-const loading = ref(false);
 const rules = reactive({
   name: [
-    { required: true, message: '请选择目标图层', trigger: 'blur' },
+    { required: true, message: '请输入图层名称', trigger: 'blur' },
   ],
 })
 const form = reactive({

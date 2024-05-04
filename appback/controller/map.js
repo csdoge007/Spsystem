@@ -11,7 +11,8 @@ import {
   getResidentScore,
   getCompetitorScore,
   getTrafficScore,
-  deleteEditLayer } from "../service/map.js";
+  deleteEditLayer,
+  updateLayerName } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -278,7 +279,18 @@ export async function deleteLayer (req, res, next) {
     await deleteEditLayer(layerName, corporation);
     res.status(200).send();
   } catch (error) {
-    console.error(err);
-    res.status(500).send("Error" + err);
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function reLayerName (req, res, next) {
+  try {
+    const { layerInfo } = req.body;
+    const { corporation } = req;
+    await updateLayerName(layerInfo, corporation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erroe" + error);
   }
 }

@@ -9,6 +9,10 @@ export const useLayerStore = defineStore('layer', () => {
   const map = ref(null);
   const editingPoint = ref(null);
   const editing = ref(false);
+  const changeLayerName = (name, id) => {
+    const layer = layers.value.filter(item => item.id === id)[0];
+    layer.name = name;
+  };
   function clearEditingPoint() {
     map.value.removeLayer(editingPoint.value);
     editingPoint.value = null;
@@ -69,5 +73,5 @@ export const useLayerStore = defineStore('layer', () => {
     const layer = layers.value.filter(layer => layer.name === name)[0];
     layer.isviewed = !layer.isviewed;
   }
-  return { map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
+  return { changeLayerName, map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
 });
