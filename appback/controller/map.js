@@ -291,6 +291,6 @@ export async function reLayerName (req, res, next) {
     await updateLayerName(layerInfo, corporation);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erroe" + error);
+    res.status(500).send("Error" + error);
   }
 }

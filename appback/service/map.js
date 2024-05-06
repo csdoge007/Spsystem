@@ -286,6 +286,7 @@ export async function getTrafficQuantity (pointInfo) {
       ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3);
     `;
     const { rows } = await pool_client.query(query, [x, y, radius]);
+    console.log('com_count', rows[0].com_count);
     return rows[0].com_count;
   } catch (err) {
     console.error(err);

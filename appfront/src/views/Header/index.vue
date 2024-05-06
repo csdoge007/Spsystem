@@ -13,7 +13,7 @@
       <el-dropdown trigger="click" popper-class="popper-class" @command=handleCommand>
         <div class="avatar"  @click="popPanel">
           <img :src="imgUrl">
-          <span class="username" style="margin-left:5px;">admin</span>
+          <span class="username" style="margin-left:5px;">Kevin</span>
           <el-icon><ArrowDown /></el-icon>
         </div>
         <template #dropdown>
@@ -44,7 +44,6 @@ const handleCommand = () => {
   router.push({ path: '/' })
 };
 </script>
-
 <style scoped>
 .header {
   height: 100%;

@@ -7,13 +7,7 @@
         <h2 class="outline-none">商选易达</h2>
         <div class="login-form" v-if="currentPage === 0">
           <el-form ref="ruleFormRef" :model="ruleForm" :rules="loginRules" size="large">
-            <el-form-item :rules="[
-            {
-              required: true,
-              message: '请输入账号',
-              trigger: 'blur'
-            }
-          ]" prop="account">
+            <el-form-item prop="account">
               <el-input v-model="ruleForm.account" clearable placeholder="账号" :prefix-icon="User"/>
             </el-form-item>
             <el-form-item prop="password">

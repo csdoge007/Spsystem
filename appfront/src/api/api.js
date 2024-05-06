@@ -57,3 +57,7 @@ export const deleteLayer = (layerName) => axios.delete('/deleteLayer', {
 export const reLayerName = (layerInfo) => axios.put('/reLayerName', {
   layerInfo,
 });
+
+export const registerUser = (userInfo) => axios.post('/registerUser', {
+  userInfo,
+});

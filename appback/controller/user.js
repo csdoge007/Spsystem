@@ -1,7 +1,7 @@
 import pool from "../config.js";
 import { secretKey } from "../config.js";
 import jwt from 'jsonwebtoken';
-import { getUserByAccount } from "../service/user.js";
+import { getUserByAccount, verifyCpr, verifyOnlyAcc, verifyOnlyUser, addUser, searchCorporation } from "../service/user.js";
 export async function login (req, res, next) {
   let pool_client;
   try {
@@ -61,5 +61,35 @@ export async function login (req, res, next) {
   }
 };
 
-
+export async function registerUser (req, res, next) {
+  try {
+    const { userInfo } = req.body;
+    const { corporationCode, account, username, password } = userInfo;
+    const corporation = await searchCorporation(corporationCode);
+    const existCorporation = await verifyCpr(corporationCode);
+    if (!existCorporation) {
+      res.status(200).send({errorTip: 1});
+      return;
+    }
+    const isOnlyAcc = await verifyOnlyAcc(account);
+    if (!isOnlyAcc) {
+      res.status(200).send({errorTip: 2});
+      return;
+    }
+    const isOnlyUser = await verifyOnlyUser(username, corporationCode);
+    if (!isOnlyUser) {
+      res.status(200).send({errorTip: 3});
+      return;
+    }
+    await addUser({ account, username, corporation, password });
+    res.status(200).send(
+      {
+        msg: '注册成功',
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
 

@@ -12,9 +12,9 @@ import {
   updateView, 
   getScores, 
   deleteLayer,
-  reLayerName } from './controller/map.js';
+  reLayerName, } from './controller/map.js';
 import authenticateToken from './middleware/jwt.js';
-import { login } from './controller/user.js';
+import { login, registerUser } from './controller/user.js';
 const app = express();
 
 const port = 3000;
@@ -52,6 +52,8 @@ app.get('/getScores', authenticateToken, getScores);
 app.delete('/deleteLayer', authenticateToken, deleteLayer);
 
 app.put('/reLayerName', authenticateToken, reLayerName);
+
+app.post('/registerUser', registerUser);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
