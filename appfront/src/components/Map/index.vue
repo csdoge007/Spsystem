@@ -1,5 +1,6 @@
 <template>
   <div id="map">
+    <canvas id="canvasMap" style="display: none"></canvas>
     <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
     <Popup :name="popupName" ref="popup" v-if="isPopuped && !isEdit" @close="closePopup"></Popup>
   </div>
@@ -10,29 +11,36 @@ import { usePointStore } from '@/stores/point';
 import { useLayerStore } from '@/stores/layer';
 import { storeToRefs } from 'pinia';
 import debounce from 'lodash.debounce';
-import 'leaflet/dist/leaflet.css';
 import { getPoi, searchPoi, boxSelectPoi } from '@/api/api';
-import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds } from 'leaflet';
+import { Map, TileLayer, marker, layerGroup, control, divIcon, Control, Marker, bounds, geoJSON, FeatureGroup, imageOverlay, polygon } from 'leaflet';
 import 'leaflet-draw';
 import { onMounted, ref, watch, onBeforeUnmount, nextTick } from 'vue';
 import { svgTypes } from '@/assets/svg/svg';
 import coordtransform from 'coordtransform';
-import { useSelectStore } from '@/stores/select';
+import { useSelectStore, useRecommendStore } from '@/stores/select';
 import Popup from '@/components/Popup/index.vue';
+import * as turf from '@turf/turf';
+import kriging from '@sakitam-gis/kriging';
 defineOptions({
   name: 'Map'
 })
 const layerStore = useLayerStore();
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
+const recommendStore = useRecommendStore();
 const { pointLatLng, isPopuped, popupName } = storeToRefs(selectStore);
 const { openPopup, closePopup, changePointLatLng, changePopupName } = selectStore;
 let map = null;
 let Layer = null;
 let baseLayers = {};
+let imageLayerGroup = null;
+let drawControl = null;
+let polygonDrawed = null;
+let polygonBox = null;
 const popup = ref(null);
 const props = defineProps({
   isEdit: Boolean,
+  isrecommended: Boolean
 });
 L.Popup.prototype._animateZoom = function (e) {
   if (!this._map) {
@@ -66,6 +74,9 @@ watch(() => selectStore.selectedPoints, (newPoints) => {
   }
   map.addLayer(markers);
   
+});
+watch(() => recommendStore.thermalData, (newValue) => {
+  console.log('newValue', newValue);
 });
 const input = ref('');
 const showSearchPoi = (data, wrappedLayer) => {
@@ -117,7 +128,7 @@ const initMap = () => {
       cacheControl: 'public,max-age=3600' 
     })
     Layer.addTo(map)
-    map.setView([32.1141, 118.93198], 11)
+    map.setView([32.1141, 118.93198], 13)
     map.attributionControl.remove();
     map.zoomControl.setPosition('bottomright');
     if (props.isEdit) {
@@ -125,7 +136,8 @@ const initMap = () => {
     } else {
       pointStore.setMap(map);
     }
-    addDrawControl();
+    addDrawControl(props.isrecommended);
+    imageLayerGroup = new FeatureGroup().addTo(map).bringToFront()
   }
 }
 const buildLayerTree = (data) => {
@@ -200,20 +212,25 @@ const addPopupEvents = () => {
   });
   map.on('move', movePopupEvent);
 };
-const addDrawControl = () => {
-  let drawControl = new Control.Draw({
+watch(() => props.isrecommended, (newValue) => {
+  console.log('触发');
+  map.removeControl(drawControl);
+  addDrawControl(props.isrecommended);
+});
+const addDrawControl = (isrecommended) => {
+  drawControl = new Control.Draw({
     draw: {
       polyline: false,
-      polygon: !props.isEdit,
+      polygon: isrecommended,
       rectangle: false,
-      circle: !props.isEdit,
+      circle: !isrecommended,
       circlemarker: false,
       marker: props.isEdit,
     },
     edit: false,
     remove: false, // 禁用删除
   });
-  console.log(drawControl);
+  console.log('drawControl', drawControl);
   map.addControl(drawControl);
 };
 const moveEditEvent = ()=> {
@@ -257,12 +274,96 @@ const addDrawEvents = async () => {
         map.panTo([lat, lng]);
         map.on('move', moveEditEvent);
       } else {
-        await boxSelectPoi(polygonGeoJson.geometry);
+        console.log('geometry', polygonGeoJson.geometry, e.layerType);
+        const boundaries = turf.lineString(polygonGeoJson.geometry.coordinates[0]);
+        let bbox = turf.bbox(boundaries); // 外包矩形范围
+        console.log('bbox', bbox);
+        let bboxPolygon = turf.bboxPolygon(bbox);
+        const bboxlatlngs = bboxPolygon.geometry.coordinates[0];
+        bboxlatlngs.forEach((item,idx) => {
+          bboxlatlngs[idx] = [item[1], item[0]];
+        });
+        if (polygonBox) {
+          map.removeLayer(polygonBox);
+        }
+        if (polygonDrawed) {
+          map.removeLayer(polygonDrawed);
+        }
+        polygonDrawed = drawedLayer;
+        polygonBox = polygon(bboxlatlngs, {color: 'red'}).addTo(map);
+        recommendStore.drawBox();
+        recommendStore.setBboxlatlngs(bboxlatlngs);
       }
     } catch (err) {
       console.error(err);
     }
   });
+};
+const testKriging = () => {
+  let canvas = document.getElementById("canvasMap");
+  const boundaries = turf.lineString([[110, 32], [118, 40], [120, 35]]);
+  let scope = geoJSON(boundaries, {
+    style: function () {
+      return {
+        fillColor: '6666ff',
+        color: 'red',
+        weight: 2,
+        opacity: 0,
+        fillOpacity: 0,
+      };
+    }
+  }).addTo(imageLayerGroup);
+  map.fitBounds(scope.getBounds());
+  let xlim = [scope.getBounds()._southWest.lng, scope.getBounds()._northEast.lng];
+  let ylim = [scope.getBounds()._southWest.lat, scope.getBounds()._northEast.lat];
+  console.log('xlim', xlim);
+  console.log('ylim', ylim);
+  let positionData = turf.randomPoint(50, { bbox: turf.bbox(boundaries) });
+  turf.featureEach(positionData, function (currentFeature, featureIndex) {
+    currentFeature.properties = { value: (Math.random() * 100).toFixed(2) };
+  });
+  console.log(positionData);
+  const t = positionData.features.map(point => {
+    return point.properties.value;
+  });
+  const x = positionData.features.map(point => {
+    return point.geometry.coordinates[0];
+  });
+  const y = positionData.features.map(point => {
+    return point.geometry.coordinates[1];
+  });
+  const params = {
+    krigingModel: 'exponential',//model还可选'gaussian','spherical'
+    krigingSigma2: 0,
+    krigingAlpha: 100,
+    canvasAlpha: 0.8,//canvas图层透明度-0.75
+    colors: ["#00A600", "#01A600", "#03A700", "#04A700", "#05A800", "#07A800", "#08A900", "#09A900", "#0BAA00", "#0CAA00", "#0DAB00", "#0FAB00", "#10AC00", "#12AC00", "#13AD00", "#14AD00", "#16AE00", "#17AE00", "#19AF00", "#1AAF00", "#1CB000", "#1DB000", "#1FB100", "#20B100", "#22B200", "#23B200", "#25B300", "#26B300", "#28B400", "#29B400", "#2BB500", "#2CB500", "#2EB600", "#2FB600", "#31B700", "#33B700", "#34B800", "#36B800", "#37B900", "#39B900", "#3BBA00", "#3CBA00", "#3EBB00", "#3FBB00", "#41BC00", "#43BC00", "#44BD00", "#46BD00", "#48BE00", "#49BE00", "#4BBF00", "#4DBF00", "#4FC000", "#50C000", "#52C100", "#54C100", "#55C200", "#57C200", "#59C300", "#5BC300", "#5DC400", "#5EC400", "#60C500", "#62C500", "#64C600", "#66C600", "#67C700", "#69C700", "#6BC800", "#6DC800", "#6FC900", "#71C900", "#72CA00", "#74CA00", "#76CB00", "#78CB00", "#7ACC00", "#7CCC00", "#7ECD00", "#80CD00", "#82CE00", "#84CE00", "#86CF00", "#88CF00", "#8AD000", "#8BD000", "#8DD100", "#8FD100", "#91D200", "#93D200", "#95D300", "#97D300", "#9AD400", "#9CD400", "#9ED500", "#A0D500", "#A2D600", "#A4D600", "#A6D700", "#A8D700", "#AAD800", "#ACD800", "#AED900", "#B0D900", "#B2DA00", "#B5DA00", "#B7DB00", "#B9DB00", "#BBDC00", "#BDDC00", "#BFDD00", "#C2DD00", "#C4DE00", "#C6DE00", "#C8DF00", "#CADF00", "#CDE000", "#CFE000", "#D1E100", "#D3E100", "#D6E200", "#D8E200", "#DAE300", "#DCE300", "#DFE400", "#E1E400", "#E3E500", "#E6E600", "#E6E402", "#E6E204", "#E6E105", "#E6DF07", "#E6DD09", "#E6DC0B", "#E6DA0D", "#E6D90E", "#E6D710", "#E6D612", "#E7D414", "#E7D316", "#E7D217", "#E7D019", "#E7CF1B", "#E7CE1D", "#E7CD1F", "#E7CB21", "#E7CA22", "#E7C924", "#E8C826", "#E8C728", "#E8C62A", "#E8C52B", "#E8C42D", "#E8C32F", "#E8C231", "#E8C133", "#E8C035", "#E8BF36", "#E9BE38", "#E9BD3A", "#E9BC3C", "#E9BB3E", "#E9BB40", "#E9BA42", "#E9B943", "#E9B945", "#E9B847", "#E9B749", "#EAB74B", "#EAB64D", "#EAB64F", "#EAB550", "#EAB552", "#EAB454", "#EAB456", "#EAB358", "#EAB35A", "#EAB35C", "#EBB25D", "#EBB25F", "#EBB261", "#EBB263", "#EBB165", "#EBB167", "#EBB169", "#EBB16B", "#EBB16C", "#EBB16E", "#ECB170", "#ECB172", "#ECB174", "#ECB176", "#ECB178", "#ECB17A", "#ECB17C", "#ECB17E", "#ECB27F", "#ECB281", "#EDB283", "#EDB285", "#EDB387", "#EDB389", "#EDB38B", "#EDB48D", "#EDB48F", "#EDB591", "#EDB593", "#EDB694", "#EEB696", "#EEB798", "#EEB89A", "#EEB89C", "#EEB99E", "#EEBAA0", "#EEBAA2", "#EEBBA4", "#EEBCA6", "#EEBDA8", "#EFBEAA", "#EFBEAC", "#EFBFAD", "#EFC0AF", "#EFC1B1", "#EFC2B3", "#EFC3B5", "#EFC4B7", "#EFC5B9", "#EFC7BB", "#F0C8BD", "#F0C9BF", "#F0CAC1", "#F0CBC3", "#F0CDC5", "#F0CEC7", "#F0CFC9", "#F0D1CB", "#F0D2CD", "#F0D3CF", "#F1D5D1", "#F1D6D3", "#F1D8D5", "#F1D9D7", "#F1DBD8", "#F1DDDA", "#F1DEDC", "#F1E0DE", "#F1E2E0", "#F1E3E2", "#F2E5E4", "#F2E7E6", "#F2E9E8", "#F2EBEA", "#F2ECEC", "#F2EEEE", "#F2F0F0", "#F2F2F2"
+    ]
+  };
+  let variogram = kriging.train(t, x, y, params.krigingModel, params.krigingSigma2, params.krigingAlpha);
+  let bbox = turf.bbox(boundaries); // 外包矩形范围
+    // 根据外包矩形范围生成外包矩形面Polygon
+  let bboxPolygon = turf.bboxPolygon(bbox);
+  let positions = [];
+  console.log(bboxPolygon.geometry.coordinates[0]);
+  bboxPolygon.geometry.coordinates[0].forEach((v) => {
+    positions.push([v[0], v[1]])
+  })
+  console.log(positions);
+  let range = [positions]
+  // 使用variogram对象使polygons描述的地理位置内的格网元素具备不一样的预测值,最后一个参数，是插值格点精度大小
+  let grid = kriging.grid(range, variogram, 0.05);
+  console.log('grid', grid);
+  // 将得到的格网grid渲染至canvas上
+  kriging.plot(canvas, grid, [xlim[0], xlim[1]], [ylim[0], ylim[1]], params.colors);
+  function returnImgae() {
+    let mycanvas = document.getElementById("canvasMap");
+    return mycanvas.toDataURL("image/png");
+  }
+  let imageBounds = [[ylim[0], xlim[0]], [ylim[1], xlim[1]]];
+  // let imageBounds = [[32, 110], [40, 118], [35, 120]];
+  imageOverlay(returnImgae(), imageBounds, { opacity: 0.8 }).addTo(imageLayerGroup);
+  
 };
 onMounted(async () => {
   initMap();
@@ -271,6 +372,7 @@ onMounted(async () => {
     buildLayerTree(data);
     addDrawEvents();
     addPopupEvents();
+    // testKriging();
   } catch (err) {
     console.error(err);
   }

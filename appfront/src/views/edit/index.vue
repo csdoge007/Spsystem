@@ -5,7 +5,7 @@
     </LeftSlide>
     <div class="map-info">
       <InfoSubmission v-if="!hidden" ref="infoSubmission" @hide="hide"></InfoSubmission>
-      <Map :isEdit="true"></Map>
+      <Map :isEdit="true" class="map"></Map>
     </div>
   </div>
 </template>
@@ -66,5 +66,8 @@ onMounted(async () => {
   position: relative;
   height: 100%;
   width:100%;
+}
+.map {
+  height: 100%;
 }
 </style>

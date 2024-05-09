@@ -1,5 +1,6 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
+import * as turf from '@turf/turf';
 import { 
   circleSelectPoi, 
   readLayers, 
@@ -12,7 +13,8 @@ import {
   getCompetitorScore,
   getTrafficScore,
   deleteEditLayer,
-  updateLayerName } from "../service/map.js";
+  updateLayerName,
+  getPointsAccess } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -289,6 +291,30 @@ export async function reLayerName (req, res, next) {
     const { layerInfo } = req.body;
     const { corporation } = req;
     await updateLayerName(layerInfo, corporation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+
+export async function getThermalData (req, res, next) {
+  try {
+    const { boxInfo, type, radius } = req.body;
+    let positionData = turf.randomPoint(20, { bbox: [boxInfo[0][1], boxInfo[0][0], boxInfo[2][1], boxInfo[2][0]] });
+    const pointsPosition = positionData.features.map(point => {
+      const { coordinates } = point.geometry;
+      return coordinates;
+    });
+    // console.log('pointsPosition', pointsPosition);
+    const pointsInfo = pointsPosition.map(point => {
+      return {
+        locationx: point[0],
+        locationy: point[1],
+      }
+    });
+    const data = await getPointsAccess({ pointsInfo, type, radius });
+    res.status(200).send(data);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error" + error);

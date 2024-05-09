@@ -1,4 +1,5 @@
 import pool from '../config.js';
+import coordtransform from 'coordtransform';
 export async function circleSelectPoi (location, tableName, radius) {
   let pool_client;
   try {
@@ -348,5 +349,68 @@ export async function updateLayerName (layerInfo, corporation) {
       }
     }
   }
+}
+
+export async function getPointsAccess ({pointsInfo, radius, type}) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const createFunctionQuery = `
+      CREATE OR REPLACE FUNCTION calculate_sum(x_val double precision, y_val double precision, radius_val integer, poitype_val text)
+      RETURNS double precision AS
+      $$ 
+      DECLARE 
+        sum double precision := 0; 
+        poi_rec RECORD;
+        poi_count integer; 
+      BEGIN 
+        FOR poi_rec IN SELECT *
+            FROM poppoi_nj_wgs
+            WHERE ST_DWithin(
+              poppoi_nj_wgs.geom::geography, 
+              ST_SetSRID(ST_MakePoint(x_val, y_val), 4326)::geography, 
+              radius_val
+            ) LOOP 
+          SELECT COUNT(*) INTO poi_count 
+          FROM njpoi_2020_new 
+          WHERE ST_DWithin(njpoi_2020_new.geom::geography, poi_rec.geom::geography, radius_val)
+          AND substring(type FROM '([^;]+)') = poitype_val;
+          IF poi_count > 0 THEN 
+            sum := sum + 1.0 / poi_count; 
+          END IF; 
+        END LOOP; 
+        
+        -- 返回计算得到的 sum 值
+        RETURN sum;
+      END;
+      $$
+      LANGUAGE plpgsql;
+    `;
+    pool_client.query(createFunctionQuery, (err, result) => {
+      if (err) {
+        console.error('Error executing SQL:', err);
+        return;
+      }
+    });
+    const reachabilityQueries = pointsInfo.map(point => {
+      const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
+      return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], Number(radius), type]);
+    });
+    const results = await Promise.all(reachabilityQueries);
+    const resultSums = results.map((result, idx) => {
+      return {
+        resultSums: Number(result.rows[0].result_sum.toFixed(2)),
+        x: pointsInfo[idx].locationx,
+        y: pointsInfo[idx].locationy,
+      }
+    });
+    resultSums.sort((a, b) => b.resultSums - a.resultSums);
+    return resultSums;
+  } catch (err) {
+
+  } finally {
+
+  }
+  
 }
 

@@ -61,3 +61,9 @@ export const reLayerName = (layerInfo) => axios.put('/reLayerName', {
 export const registerUser = (userInfo) => axios.post('/registerUser', {
   userInfo,
 });
+
+export const getThermalData = (boxInfo, type, radius) => axios.post('/getThermalData', {
+  boxInfo,
+  type,
+  radius,
+})

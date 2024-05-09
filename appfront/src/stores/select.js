@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { usePointStore } from './point';
 import { getLayers } from '../api/api';
+import { getThermalData } from '../api/api';
 export const useSelectStore = defineStore('select', () => {
   const selectedPoints = ref([]);
   const isPopuped = ref(false);
@@ -44,3 +45,24 @@ export const useSelectStore = defineStore('select', () => {
   }
   return { changePopupName, popupName, changePointLatLng, pointLatLng, selectedPoints, importSelectedPoints, panToActivePoint, isPopuped, closePopup, openPopup, fetchLayers, layers };
 });
+
+export const useRecommendStore = defineStore('recommend', () => {
+  const isdrawedBox = ref(false);
+  const bboxlatlngs = ref([]);
+  const thermalData = ref([]);
+  const getThermal = async ({type, radius}) => {
+    const data = await getThermalData(bboxlatlngs.value, type, radius);
+    thermalData.value = data.data;
+  };
+  const drawBox = () => {
+    isdrawedBox.value = true;
+  };
+  const clearBox = () => {
+    isdrawedBox.value = false;
+  };
+  const setBboxlatlngs = (latlngs) => {
+    bboxlatlngs.value = latlngs;
+  };
+  return { thermalData, getThermal, setBboxlatlngs, bboxlatlngs, isdrawedBox, drawBox, clearBox };
+})
+

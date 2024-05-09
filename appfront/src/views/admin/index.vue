@@ -5,7 +5,7 @@
     </el-aside>
 
     <el-container>
-      <el-header>
+      <el-header :class="{isline: routeName === '选址规划'}">
         <Header :routeName="routeName"></Header>
       </el-header>
       <el-main>
@@ -49,5 +49,8 @@ watch(() => route.meta.alias,(newName) => {
 }
 .el-main {
   padding: 0;
+}
+.isline {
+  border-bottom: 1px solid lightgrey;
 }
 </style>
