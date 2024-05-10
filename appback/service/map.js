@@ -407,9 +407,15 @@ export async function getPointsAccess ({pointsInfo, radius, type}) {
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
     return resultSums;
   } catch (err) {
-
+    console.error(err);
   } finally {
-
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
   }
   
 }

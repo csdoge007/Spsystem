@@ -1,6 +1,10 @@
 <template>
   <div class="popup">
-    {{ name }}
+    点位名称：{{ name }}
+    <br>
+    经度： {{ x }}
+    <br>
+    纬度： {{ y }}
     <div class="close" @click="close">X</div>
   </div>
 </template>
@@ -12,6 +16,8 @@ defineOptions({
 const emit = defineEmits(['close']);
 const props = defineProps({
   name: String,
+  x: Number,
+  y: Number,
 })
 const close = () => {
   emit('close');

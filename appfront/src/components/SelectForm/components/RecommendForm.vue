@@ -28,7 +28,7 @@
               controls-position="right"
             />
             <span>千米</span>
-            <el-button type="primary"  @click="onSubmit(ruleFormRef)" :loading="loading">开始评估</el-button>
+            <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary"  @click="onSubmit(ruleFormRef)" :loading="loading">开始评估</el-button>
           </el-form-item>
         </el-col>
       </el-row>
@@ -44,6 +44,7 @@ const ruleFormRef = ref();
 defineOptions({
   name: 'RecommendForm',
 });
+const fullscreenLoading = ref(false)
 const recommendStore = useRecommendStore();
 const loading = ref(false);
 const types = ref(["摩托车服务","购物服务","道路附属设施","通行设施","医疗保健服务","住宿服务","地名地址信息","汽车销售","风景名胜","汽车服务","餐饮服务","公共设施","交通设施服务","生活服务","金融保险服务","体育休闲服务","商务住宅","事件活动","室内设施","汽车维修","公司企业","政府机构及社会团体","科教文化服务"]);
@@ -74,7 +75,9 @@ const onSubmit = async (formEl) => {
           type: 'warning',
         });
       } else {
+        fullscreenLoading.value = true;
         await recommendStore.getThermal({type: form.type, radius: form.radius * 1000});
+        fullscreenLoading.value = false;
       }
       loading.value = false;
     } else {

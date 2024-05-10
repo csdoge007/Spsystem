@@ -297,16 +297,31 @@ export async function reLayerName (req, res, next) {
   }
 }
 
+function generatePoints ({l, r, t, d}) {
+  const width = r - l;
+  const height = t - d;
+  const res = [];
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 5; j++) {
+      const x = l + width / 10 * (2 * j + 1);
+      const y = t - height / 8 * (2 * i + 1);
+      res.push([x, y]);
+    }
+  }
+  return res;
+}
 
 export async function getThermalData (req, res, next) {
   try {
     const { boxInfo, type, radius } = req.body;
-    let positionData = turf.randomPoint(20, { bbox: [boxInfo[0][1], boxInfo[0][0], boxInfo[2][1], boxInfo[2][0]] });
-    const pointsPosition = positionData.features.map(point => {
-      const { coordinates } = point.geometry;
-      return coordinates;
+    const pointsPosition = generatePoints({
+      l: boxInfo[0][1],
+      r: boxInfo[2][1],
+      t: boxInfo[2][0],
+      d: boxInfo[0][0],
     });
-    // console.log('pointsPosition', pointsPosition);
+    console.log('pointsPosition', pointsPosition);
+    console.log('boxInfo', boxInfo);
     const pointsInfo = pointsPosition.map(point => {
       return {
         locationx: point[0],

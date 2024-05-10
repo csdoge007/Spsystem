@@ -62,6 +62,7 @@ export const useRecommendStore = defineStore('recommend', () => {
   };
   const setBboxlatlngs = (latlngs) => {
     bboxlatlngs.value = latlngs;
+    console.log('bboxlatlngs', bboxlatlngs.value);
   };
   return { thermalData, getThermal, setBboxlatlngs, bboxlatlngs, isdrawedBox, drawBox, clearBox };
 })
