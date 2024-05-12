@@ -20,9 +20,9 @@ import {
   getCurrentItems,
   getEditData,
   updateLayerData,
-  deleteNewLayer } from './controller/map.js';
+  deleteNewLayer, } from './controller/map.js';
 import authenticateToken from './middleware/jwt.js';
-import { login, registerUser } from './controller/user.js';
+import { login, registerUser, getUserInfo, updateUserInfo, getUserName } from './controller/user.js';
 const app = express();
 
 const port = 3000;
@@ -76,6 +76,11 @@ app.get('/getCurrentItems', authenticateToken, getCurrentItems);
 app.get('/getEditData', authenticateToken, getEditData);
 app.post('/updateLayerData', authenticateToken, updateLayerData);
 app.delete('/deleteNewLayer', authenticateToken, deleteNewLayer);
+
+app.get('/getUserInfo', authenticateToken, getUserInfo);
+
+app.put('/updateUserInfo',authenticateToken, updateUserInfo);
+app.get('/getUserName', authenticateToken, getUserName);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });

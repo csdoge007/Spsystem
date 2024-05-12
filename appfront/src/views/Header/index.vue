@@ -13,7 +13,7 @@
       <el-dropdown trigger="click" popper-class="popper-class" @command=handleCommand>
         <div class="avatar"  @click="popPanel">
           <img :src="imgUrl">
-          <span class="username" style="margin-left:5px;">Kevin</span>
+          <span class="username" style="margin-left:5px;">{{ username }}</span>
           <el-icon><ArrowDown /></el-icon>
         </div>
         <template #dropdown>
@@ -30,10 +30,16 @@
 import imgUrl from './avator.jpg';
 import { ArrowDown } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
+import { useLoginStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 const router = useRouter();
 defineOptions({
   name: 'Header',
 });
+const loginStore = useLoginStore();
+const { username } = storeToRefs(loginStore);
+const { setUserName } = loginStore;
 const props = defineProps({
   routeName: {
     type: String,
@@ -43,6 +49,9 @@ const props = defineProps({
 const handleCommand = () => {
   router.push({ path: '/' })
 };
+onMounted(async () => {
+  await setUserName();
+});
 </script>
 <style scoped>
 .header {
@@ -65,6 +74,7 @@ const handleCommand = () => {
 img {
   width: 35px;
   height: 35px;
+  border-radius: 50%;
 }
 .username {
   display: inline-block;

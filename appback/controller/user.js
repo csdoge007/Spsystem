@@ -1,7 +1,7 @@
 import pool from "../config.js";
 import { secretKey } from "../config.js";
 import jwt from 'jsonwebtoken';
-import { getUserByAccount, verifyCpr, verifyOnlyAcc, verifyOnlyUser, addUser, searchCorporation } from "../service/user.js";
+import { getUserByAccount, verifyCpr, verifyOnlyAcc, verifyOnlyUser, addUser, searchCorporation, searchUser, updateUser, searchUserName } from "../service/user.js";
 export async function login (req, res, next) {
   let pool_client;
   try {
@@ -29,7 +29,7 @@ export async function login (req, res, next) {
     console.log('密码正确');
     const token = jwt.sign(
       {
-        id: userInfo._id,
+        id: userInfo.id,
         account: userInfo.account,
         corporation: userInfo.corporation,
       },
@@ -93,3 +93,38 @@ export async function registerUser (req, res, next) {
   }
 }
 
+export async function getUserInfo (req, res, next) {
+  try {
+    const { id } = req;
+    console.log('id', id)
+    const data = await searchUser(id);
+    console.log(data);
+    res.status(200).send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+} 
+
+export async function updateUserInfo (req, res, next) {
+  try {
+    const { userInfo } = req.body;
+    await updateUser(userInfo);
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+
+export async function getUserName (req, res, next) {
+  try {
+    const { id } = req;
+    const data = await searchUserName(id);
+    res.status(200).send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}

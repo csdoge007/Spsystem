@@ -95,3 +95,11 @@ export const deleteNewLayer = (layerName) => axios.delete('/deleteNewLayer', {
     layerName,
   }
 });
+
+export const getUserInfo = () => axios.get('/getUserInfo');
+
+export const updateUserInfo = (userInfo) => axios.put('/updateUserInfo', {
+  userInfo
+});
+
+export const getUserName = () => axios.get('/getUserName');

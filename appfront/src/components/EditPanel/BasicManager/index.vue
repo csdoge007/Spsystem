@@ -1,7 +1,7 @@
 <template>
   <div class="basic">
     <ManagerHeader></ManagerHeader>
-    <el-scrollbar height="532px">
+    <el-scrollbar height="570px">
       <el-collapse accordion @change="toggleItem">
         <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>

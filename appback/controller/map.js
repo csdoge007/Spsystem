@@ -20,7 +20,7 @@ import {
   selectCurrentItems,
   getLayerData,
   updateLayerNew,
-  dropNewLayer } from "../service/map.js";
+  dropNewLayer, } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -486,3 +486,4 @@ export async function deleteNewLayer (req, res, next) {
     res.status(500).send("Error" + error);
   }
 }
+

@@ -133,3 +133,81 @@ export async function searchCorporation (corporationCode) {
     }
   }
 }
+
+export async function searchUser (id) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+      SELECT account, password, username, corporation, ismanager
+      FROM users
+      WHERE id = $1;
+    `;
+    const { rows } = await pool_client.query(query, [id]);
+    return rows[0];
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function updateUser (userInfo) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { account, data, type } = userInfo;
+    const query1 = `
+      UPDATE users SET username = $1
+      WHERE account = $2;
+    `;
+    const query2 = `
+      UPDATE users SET password = $1
+      WHERE account = $2;
+    `;
+    if (type === 'username') {
+      await pool_client.query(query1, [data, account]);
+    } else {
+      await pool_client.query(query2, [data, account]);  
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function searchUserName (id) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+      SELECT username, ismanager FROM users
+      WHERE id = $1;
+    `;
+    const data = await pool_client.query(query, [id]);  
+    return data.rows[0];
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}

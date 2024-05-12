@@ -28,7 +28,13 @@ const routes = [
         component: () => import('../views/DataManager/index.vue'),
         name: 'datamanager',
         meta: { alias: '数据管理' }, 
-      }
+      },
+      {
+        path: 'userInfo',
+        component: () => import('../views/UserInfo/index.vue'),
+        name: 'userInfo',
+        meta: { alias: '基础信息' },
+      },
     ] 
   },
 ]

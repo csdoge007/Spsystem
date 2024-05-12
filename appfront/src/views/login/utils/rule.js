@@ -87,4 +87,18 @@ const registRules = reactive({
   ]
 });
 
-export { loginRules, registRules };
+const userRules = reactive({
+  password: [
+    {
+      validator: validatePass,
+      trigger: "blur"
+    }
+  ],
+  name: [
+    {
+      validator: validateUser,
+      trigger: "blur",
+    }
+  ],
+})
+export { loginRules, registRules, userRules };
