@@ -22,6 +22,12 @@ const routes = [
         component: Edit,
         name: 'Edit',
         meta: { alias: '企业制图' },
+      },
+      {
+        path: 'datamanager',
+        component: () => import('../views/DataManager/index.vue'),
+        name: 'datamanager',
+        meta: { alias: '数据管理' }, 
       }
     ] 
   },

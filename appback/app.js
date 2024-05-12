@@ -13,7 +13,14 @@ import {
   getScores, 
   deleteLayer,
   reLayerName,
-  getThermalData } from './controller/map.js';
+  getThermalData,
+  deletePoint,
+  getNewLayers,
+  getTotal,
+  getCurrentItems,
+  getEditData,
+  updateLayerData,
+  deleteNewLayer } from './controller/map.js';
 import authenticateToken from './middleware/jwt.js';
 import { login, registerUser } from './controller/user.js';
 const app = express();
@@ -58,6 +65,17 @@ app.post('/registerUser', registerUser);
 
 app.post('/getThermalData', authenticateToken, getThermalData);
 
+app.delete('/deletePoint', authenticateToken, deletePoint);
+
+app.get('/getNewLayers', authenticateToken, getNewLayers);
+
+app.get('/getTotal', authenticateToken, getTotal);
+
+app.get('/getCurrentItems', authenticateToken, getCurrentItems);
+
+app.get('/getEditData', authenticateToken, getEditData);
+app.post('/updateLayerData', authenticateToken, updateLayerData);
+app.delete('/deleteNewLayer', authenticateToken, deleteNewLayer);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });

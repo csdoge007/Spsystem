@@ -10,18 +10,22 @@
       </el-header>
       <el-main>
         <router-view v-slot="{ Component }"> 
-          <keep-alive>
+          <keep-alive v-if="Component == DataManager">
             <component :is="Component" />
           </keep-alive>
+          <component :is="Component" v-else />
         </router-view>
       </el-main>
     </el-container>
   </el-container>
   <LayerInfo v-if="layerDialog"></LayerInfo>
-  <ReNameInfo v-if="reNameDialog" :layerId="reNameId"></ReNameInfo>
+  <ReNameInfo :layerId="reNameId"></ReNameInfo>
+  <DataUpdate v-if="updateDialog"></DataUpdate>
 </template>
 
 <script setup>
+import DataUpdate from '@/views/DataManager/DataUpdate/index.vue';
+import DataManager from '../DataManager/index.vue';
 import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
 import ReNameInfo from '@/components/EditPanel/BasicManager/EditItem/EditItemHeader/ReNameInfo/index.vue';
@@ -31,7 +35,7 @@ import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue';
 import Header from '../Header/index.vue';
 const dialogStore = useDialogStore();
-const { reNameId, layerDialog, reNameDialog } = storeToRefs(dialogStore);
+const { reNameId, layerDialog, updateDialog} = storeToRefs(dialogStore);
 defineOptions({
   name: 'Admin'
 });

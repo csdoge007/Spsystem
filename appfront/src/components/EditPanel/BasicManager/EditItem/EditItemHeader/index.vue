@@ -94,7 +94,7 @@ const handleCommand = async (commandItem) => {
     await deleteLayer(props.name);
     fetchLayers();
   } else if (commandItem === 'u') {
-    changeReNameId(props.id);
+    changeReNameId(props.name);
     openReNameDialog();
   }
 };

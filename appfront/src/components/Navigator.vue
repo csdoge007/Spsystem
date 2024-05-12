@@ -22,7 +22,7 @@
             <el-icon><location /></el-icon>
             <span>智能选址</span>
           </template>
-          <el-menu-item index="2-1">数据管理</el-menu-item>
+          <el-menu-item index="datamanager" @click="goTo('datamanager')">数据管理</el-menu-item>
           <el-menu-item index="Select" @click="goTo('Select')">选址规划</el-menu-item>
           <el-menu-item index="2-3">我的收藏</el-menu-item>
         </el-sub-menu>

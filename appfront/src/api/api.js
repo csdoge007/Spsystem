@@ -67,3 +67,31 @@ export const getThermalData = (boxInfo, type, radius) => axios.post('/getThermal
   type,
   radius,
 })
+
+export const deletePoint = (pointInfo) => axios.delete('/deletePoint', {
+  params: {
+    pointInfo,
+  }
+});
+
+export const getNewLayers = () => axios.get('/getNewLayers');
+
+export const getTotal = () => axios.get('/getTotal');
+
+export const getCurrentItems = (itemInfo)  => axios.get('/getCurrentItems', {
+  params: {
+    itemInfo,
+  }
+});
+
+export const getEditData = () => axios.get('/getEditData');
+
+export const updateLayerData = (layerData) => axios.post('/updateLayerData', {
+  layerData,
+});
+
+export const deleteNewLayer = (layerName) => axios.delete('/deleteNewLayer', {
+  params: {
+    layerName,
+  }
+});

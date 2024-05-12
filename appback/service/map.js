@@ -31,14 +31,14 @@ export async function circleSelectPoi (location, tableName, radius) {
   }
 }
 
-export async function readLayers () {
+export async function readLayers (corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
     const query = `
-    SELECT id, name, type, group_name,isviewed,quantity FROM layer;
+    SELECT id, name, type, group_name,isviewed,quantity FROM layer WHERE corporation = $1;
     `;
-    const result = await pool_client.query(query);
+    const result = await pool_client.query(query, [corporation]);
     
     return result.rows;
   }catch (err) {
@@ -64,7 +64,12 @@ export async function createLayer (layerInfo) {
     const query = `
     INSERT INTO layer (name, type, group_name, quantity, isviewed, corporation) VALUES ($1, $2, $3, $4, $5, $6);
     `;
+    const query2 = `
+    INSERT INTO layer_new (name, type, quantity, corporation) VALUES ($1, $2, $3, $4, $5, $6);
+    `;
     await pool_client.query(query, [name, type, group_name, quantity, isviewed, corporation]);
+    await pool_client.query(query2, [name, type, quantity, corporation]);
+
   } catch (err) {
     // next(err);
     console.error(err);
@@ -316,8 +321,15 @@ export async function deleteEditLayer (layerName, corporation) {
   let pool_client;
   try {
     pool_client = await pool.connect();
-    const query = `DELETE FROM layer WHERE name=$1 And corporation=$2;`;
+    const query = `DELETE FROM layer WHERE name=$1 And corporation=$2;
+    `;
     await pool_client.query(query, [layerName, corporation]);
+    const query2 = `DELETE FROM point WHERE layer = $1 and corporation = $2;`
+    const query3 = `DELETE FROM layer_new WHERE name=$1 And corporation = $2;`
+    await pool_client.query(query2, [layerName, corporation]);
+    await pool_client.query(query3, [layerName, corporation]);
+
+
   } catch (err) {
     console.error(err);
   } finally {
@@ -336,8 +348,10 @@ export async function updateLayerName (layerInfo, corporation) {
   try {
     pool_client = await pool.connect();
     const { name, id } = layerInfo;
-    const query = `UPDATE layer SET name = $1 WHERE id = $2 AND corporation = $3`;
+    const query = `UPDATE layer SET name = $1 WHERE name = $2 AND corporation = $3`;
+    const query2 = `UPDATE layer_new SET name = $1 WHERE name = $2 AND corporation = $3`;
     await pool_client.query(query, [name, id, corporation]);
+    await pool_client.query(query2, [name, id, corporation]);
   } catch (err) {
     console.error(err);
   } finally {
@@ -420,3 +434,170 @@ export async function getPointsAccess ({pointsInfo, radius, type}) {
   
 }
 
+export async function dropPoint (pointInfo, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { id, layer } = pointInfo;
+    const query = `DELETE FROM point WHERE id = $1;`;
+    const query2 = 'UPDATE layer SET quantity = quantity - 1 WHERE name = $1 And corporation = $2';
+    const query3 = 'UPDATE layer_new SET quantity = quantity - 1 WHERE name = $1 And corporation = $2';
+    await pool_client.query(query, [id]);
+    await pool_client.query(query2, [layer, corporation]);
+    await pool_client.query(query3, [layer, corporation]);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function readNewLayers (corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `SELECT * FROM layer_new WHERE corporation = $1`;
+    const data = await pool_client.query(query, [corporation]);
+    return data.rows;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function getTotalQuantity (corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+    SELECT COUNT(*) AS cnt
+    FROM layer_new WHERE corporation = $1;
+    `;
+    const data = await pool_client.query(query, [corporation]);
+    return data.rows[0].cnt;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function selectCurrentItems (itemInfo, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { currentPage, itemQuantity } = itemInfo;
+    const query = `
+    SELECT *
+    FROM layer_new
+    WHERE corporation = $1
+    OFFSET (($2 - 1) * $3) ROWS
+    LIMIT $3;
+    `;
+    const data = await pool_client.query(query, [corporation, currentPage, itemQuantity]);
+    return data.rows;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function getLayerData (corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+    SELECT layer.name, layer.type, layer.quantity, layer.updatetime
+    FROM layer
+    LEFT JOIN layer_new ON layer.name = layer_new.name
+    WHERE layer_new.name IS NULL; 
+    `;
+    const data = await pool_client.query(query);
+    return data.rows;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function updateLayerNew (layerData, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const values = layerData.map(obj => `('${obj.name}', '${obj.type}', ${obj.quantity}, '${obj.updatetime}', '${corporation}')`).join(',');
+    // const values = layerData.map(layer => {
+    //   const { name, type, quantity, updatetime } = layer;
+    //   return [name, type, quantity, updatetime, corporation];
+    // });
+    const query = `
+      INSERT INTO layer_new (name, type, quantity, updatetime, corporation)
+      VALUES ${values};
+    `;
+     await pool_client.query(query);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
+export async function dropNewLayer (layerName, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const query = `
+    DELETE FROM layer_new WHERE name = $1 And corporation = $2;
+    `;
+    await pool_client.query(query, [layerName, corporation]);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}

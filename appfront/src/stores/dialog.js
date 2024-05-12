@@ -3,10 +3,17 @@ import { ref } from 'vue';
 export const useDialogStore = defineStore('dialog', () => {
   const layerDialog = ref(false);
   const reNameDialog = ref(false);
+  const updateDialog = ref(false);
   const reNameId = ref(-1);
+  const openUpdateDialog = () => {
+    updateDialog.value = true;
+  };
+  const closeUpdateDialog = () => {
+    updateDialog.value = false;
+  };
   const changeReNameId = (id) => {
     reNameId.value = id;
-  }
+  };
   const openLayerDialog = () => {
     layerDialog.value = true;
   };
@@ -19,5 +26,5 @@ export const useDialogStore = defineStore('dialog', () => {
   const closeReNameDialog = () => {
     reNameDialog.value = false;
   };
-  return { changeReNameId, reNameId, reNameDialog, openReNameDialog, closeReNameDialog, layerDialog, openLayerDialog, closeLayerDialog };
+  return { updateDialog, openUpdateDialog, closeUpdateDialog, changeReNameId, reNameId, reNameDialog, openReNameDialog, closeReNameDialog, layerDialog, openLayerDialog, closeLayerDialog };
 });

@@ -30,7 +30,7 @@
 import { useSelectStore } from '@/stores/select';
 import PanelItem from '@/components/PanelItem/index.vue';
 import RadarChart from '@/components/RadarChart/index.vue';
-import { nextTick, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 defineOptions({
   name: 'SelectPanel',
 })

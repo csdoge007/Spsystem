@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
-import { getLayers } from '../api/api';
+import { getLayers, getCurrentItems } from '../api/api';
 import { layerGroup, marker, Marker } from 'leaflet';
 // import { usePointStore } from './point';
+import { getTotal } from '@/api/api';
 export const useLayerStore = defineStore('layer', () => {
   const layers = ref([]);
   const layerElements = reactive({});
@@ -58,7 +59,8 @@ export const useLayerStore = defineStore('layer', () => {
       layerElements[name] = markers;
       for (const point of children) {
         let markerLayer = marker([point.locationy, point.locationx]).addTo(markers);
-        markerLayer.bindPopup(point.title);
+        const customPopupContent = `<div><h3>点位信息</h3><p>点位名称：${point.title}</p><p>经度：${point.locationx}</p><p>纬度：${point.locationy}</p></div>`;
+        markerLayer.bindPopup(customPopupContent);
         markerLayer.openPopup();
       }
       map.value.addLayer(markers);
@@ -74,4 +76,30 @@ export const useLayerStore = defineStore('layer', () => {
     layer.isviewed = !layer.isviewed;
   }
   return { changeLayerName, map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
+});
+
+export const useManagerStore = defineStore('manager', () => {
+  const tableData = ref([]);
+  const currentPage = ref(1);
+  const itemQuantity = ref(1);
+  const getTableData = async (itemInfo) => {
+    if (itemInfo) {
+      const data = await getCurrentItems(itemInfo);
+      currentPage.value = itemInfo.currentPage;
+      itemQuantity.value = itemInfo.itemQuantity;
+      tableData.value = data.data;
+    } else { 
+      const data = await getCurrentItems({
+        currentPage: currentPage.value,
+        itemQuantity: itemQuantity.value,
+      });
+      tableData.value = data.data;
+    }
+  }
+  const total = ref(0);
+  const getstotal = async () => {
+    const data = await getTotal();
+    total.value = data.data;
+  }
+  return { tableData, getTableData, total, getstotal, currentPage, itemQuantity };
 });

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { usePointStore } from './point';
-import { getLayers } from '../api/api';
+import { getNewLayers } from '../api/api';
 import { getThermalData } from '../api/api';
 export const useSelectStore = defineStore('select', () => {
   const selectedPoints = ref([]);
@@ -10,7 +10,8 @@ export const useSelectStore = defineStore('select', () => {
   const popupName = ref('');
   const layers = ref([]);
   const fetchLayers = async () => {
-    const dataLayer = await getLayers().then(res => res.data);
+    const dataLayer = await getNewLayers().then(res => res.data);
+
     layers.value = dataLayer.filter(layer => layer.type === 'point');
   };
   function changePopupName (newName) {

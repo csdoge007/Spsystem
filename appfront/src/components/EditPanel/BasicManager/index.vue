@@ -1,15 +1,17 @@
 <template>
   <div class="basic">
     <ManagerHeader></ManagerHeader>
+    <el-scrollbar height="532px">
       <el-collapse accordion @change="toggleItem">
-        <el-collapse-item v-for="(layer, idx) in layers" :key="layer.name" :name="layer.name">
+        <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>
           <template #title>
-            <EditItemHeader v-bind="layer" :isActived="idx === activeIdx"></EditItemHeader>
+            <EditItemHeader v-bind="layer" :isActived="activeName === layer.name"></EditItemHeader>
           </template>
           <EditItemContent :elements="layer.children ? layer.children : []"></EditItemContent>
         </el-collapse-item>
       </el-collapse>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -25,9 +27,9 @@ defineOptions({
 });
 const layerStore = useLayerStore();
 const { layers } = storeToRefs(layerStore);
-const activeIdx = ref(-1);
-const toggleItem = (idx) => {
-  activeIdx.value = idx;
+const activeName = ref(-1);
+const toggleItem = (name) => {
+  activeName.value = name;
 }
 </script>
 
@@ -40,10 +42,10 @@ const toggleItem = (idx) => {
   height: 60px;
   border-bottom: 0px;
 }
-.el-collapse {
+/*.el-collapse {
   height: 600px; 
   overflow-y: auto; 
-}
+}*/
 .el-collapse-item {
   position: relative;
 }

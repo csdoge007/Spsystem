@@ -1,6 +1,5 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
-import * as turf from '@turf/turf';
 import { 
   circleSelectPoi, 
   readLayers, 
@@ -14,7 +13,14 @@ import {
   getTrafficScore,
   deleteEditLayer,
   updateLayerName,
-  getPointsAccess } from "../service/map.js";
+  getPointsAccess,
+  dropPoint,
+  readNewLayers,
+  getTotalQuantity,
+  selectCurrentItems,
+  getLayerData,
+  updateLayerNew,
+  dropNewLayer } from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -146,6 +152,12 @@ export async function getAccessibility(req, res, next) {
       }
     });
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
+    const query2 = `
+    UPDATE layer_new
+    SET status = true
+    WHERE name = $1 And corporation = $2;
+    `;
+    await pool_client.query(query2, [layer, corporation]);
     res.status(200).send({accessibility:resultSums});
   
     // res.status(200).send(mallPois.rows);
@@ -166,6 +178,40 @@ export async function getAccessibility(req, res, next) {
 
 };
 
+async function updateLastTime (layer, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const date = now.getDate();
+    const time = `${year}-${month}-${date}`;
+    const query = `
+    UPDATE layer
+    SET updatetime = $1
+    WHERE name = $2 And corporation = $3;
+    `;
+    const query2 = `
+    UPDATE layer_new
+    SET updatetime = $1
+    WHERE name = $2 And corporation = $3;
+    `;
+    await pool_client.query(query, [time, layer, corporation]);
+    await pool_client.query(query2, [time, layer, corporation]);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    if (pool_client) {
+      try {
+        pool_client.release(); // 释放数据库连接
+      } catch (err) {
+        console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}
+
 export async function addPoint(req, res, next) {
   let pool_client;
   try {
@@ -181,8 +227,13 @@ export async function addPoint(req, res, next) {
     const updateSql = `
     UPDATE layer SET quantity = quantity + 1 WHERE name = $1 And corporation = $2;
     `
+    const updateSql2= `
+    UPDATE layer_new SET quantity = quantity + 1 WHERE name = $1 And corporation = $2;
+    `
     await pool_client.query(insertSql, [title, layer, locationx, locationy, description, address, category, corporation]);
     await pool_client.query(updateSql, [layer, corporation]);
+    await pool_client.query(updateSql2, [layer, corporation]);
+    await updateLastTime(layer, corporation);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -202,8 +253,8 @@ export async function addPoint(req, res, next) {
 
 export async function getLayers(req, res, next) {
   try {
-    const layers = await readLayers();
     const { corporation } = req;
+    const layers = await readLayers(corporation);
     const layerMap = new Map();
     for (const layer of layers) {
       layerMap[layer.name] = layer;
@@ -212,7 +263,11 @@ export async function getLayers(req, res, next) {
     const elements = await getElements(corporation);
     for (const element of elements) {
       const layer = layerMap[element.layer];
-      layer.children = layer.children ? [...layer.children, element] : [element];
+      if (layer.children) {
+        layer.children = [...layer.children, element];
+      } else {
+        layer.children = [element];
+      }
     }
     res.status(200).send(layers);
   } catch (err) {
@@ -226,7 +281,9 @@ export async function addLayer (req, res, next) {
   try {
     const { layerInfo } = req.body;
     const { corporation } = req;
+    const { name } = layerInfo;
     await createLayer({ corporation, ...layerInfo});
+    await updateLastTime(name, corporation);
     res.status(200).send();
   } catch (err) {
     next(err);
@@ -290,7 +347,9 @@ export async function reLayerName (req, res, next) {
   try {
     const { layerInfo } = req.body;
     const { corporation } = req;
+    const { name } = layerInfo;
     await updateLayerName(layerInfo, corporation);
+    await updateLastTime(name, corporation);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error" + error);
@@ -330,6 +389,98 @@ export async function getThermalData (req, res, next) {
     });
     const data = await getPointsAccess({ pointsInfo, type, radius });
     res.status(200).send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function deletePoint (req, res, next) {
+  try {
+    const { pointInfo } = req.query;
+    const { corporation } = req;
+    const { layer } = pointInfo;
+    await dropPoint(pointInfo, corporation);
+    await updateLastTime(layer, corporation);
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function getNewLayers (req, res, next) {
+  try {
+    const { corporation } = req;
+    const data = await readNewLayers(corporation);
+    res.status(200).send(data);
+  } catch (error){
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function getTotal (req, res, next) {
+  try {
+    const { corporation } = req;
+    const cnt = await getTotalQuantity(corporation);
+    res.status(200).send(cnt);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+
+export async function getCurrentItems (req, res, next) {
+  try {
+    const { corporation } = req;
+    const { itemInfo } = req.query;
+    // const { currentPage, itemQuantity } = itemInfo;
+    const data = await selectCurrentItems(itemInfo, corporation);
+    res.status(200).send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function getEditData (req, res, next) {
+  try {
+    const { corporation } = req;
+    const data = await getLayerData(corporation);
+    data.forEach((item) => {
+      item.selected = false;
+    });
+    const result = [];
+    for (let i = 0; i < data.length; i += 4) {
+      result.push(data.slice(i, i + 4));
+    }
+    res.status(200).send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function updateLayerData (req, res, next)  {
+  try {
+    const { corporation } = req;
+    const { layerData } = req.body;
+    await updateLayerNew(layerData, corporation);
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
+
+export async function deleteNewLayer (req, res, next) {
+  try {
+    const { corporation } = req;
+    const { layerName } = req.query;
+    await dropNewLayer(layerName, corporation);
+    res.status(200).send();
   } catch (error) {
     console.error(error);
     res.status(500).send("Error" + error);

@@ -2,7 +2,10 @@
   <div id="map">
     <canvas id="canvasMap" style="display: none"></canvas>
     <el-input v-model="input" placeholder="请输入商业网点地址" @input="searchPosition" v-if="isEdit"/>
-    <Popup :name="popupName" :x="pointLatLng.lng" :y="pointLatLng.lat" ref="popup" v-if="isPopuped && !isEdit && !isrecommended" @close="closePopup"></Popup>
+    <Popup :name="popupName" 
+    :x="pointLatLng.lng" 
+    :y="pointLatLng.lat" 
+    ref="popup" v-if="isPopuped && !isEdit && !isrecommended" @close="closePopup"></Popup>
   </div>
 </template>
 
@@ -28,6 +31,7 @@ const layerStore = useLayerStore();
 const selectStore = useSelectStore();
 const pointStore = usePointStore();
 const recommendStore = useRecommendStore();
+const { location } = storeToRefs(pointStore);
 const { bboxlatlngs, thermalData } = storeToRefs(recommendStore);
 const { pointLatLng, isPopuped, popupName } = storeToRefs(selectStore);
 const { openPopup, closePopup, changePointLatLng, changePopupName } = selectStore;
@@ -146,7 +150,7 @@ watch(() => recommendStore.thermalData, (newValue) => {
         html: svgTypes[i],
       });
     const markerLayer = marker([y, x], { icon: svgIcon, name: resultSums, type: 'recommend' }).addTo(markers);
-    const customPopupContent = `<div><h3>点位坐标</h3><p>经度：${x}</p><br><p>纬度：${y}</p></div>`;
+    const customPopupContent = `<div><h3>点位坐标</h3><p>经度：${x}</p><p>纬度：${y}</p></div>`;
     markerLayer.bindPopup(customPopupContent);
     if (i === 0) map.panTo([y, x]);
   }
@@ -218,13 +222,14 @@ const buildLayerTree = (data) => {
   Object.keys(data).forEach((type) => {
     const markersLayer = layerGroup();
     data[type].forEach((poi) => {
-      const { locationy, locationx } = poi;
+      const { locationy, locationx, name } = poi;
       let svgIcon = divIcon({
         className: 'custom-svg-icon',
         html: svgTypes[type],
       });
       let markerLayer = marker([locationy, locationx], { icon: svgIcon, type: 'proto'}).addTo(markersLayer);
-      markerLayer.bindPopup(poi.name);
+      const customPopupContent = `<div><h3>POI信息</h3><p>名称：${name}</p><p>类型：${type}</p><p>经度：${locationx}</p><p>纬度：${locationy}</p></div>`;
+      markerLayer.bindPopup(customPopupContent);
       markerLayer.openPopup();
     })
     baseLayers[type] = markersLayer;
