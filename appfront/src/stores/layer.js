@@ -11,7 +11,7 @@ export const useLayerStore = defineStore('layer', () => {
   const editingPoint = ref(null);
   const editing = ref(false);
   const changeLayerName = (name, id) => {
-    const layer = layers.value.filter(item => item.id === id)[0];
+    const layer = layers.value.filter(item => item.name === id)[0];
     layer.name = name;
   };
   function clearEditingPoint() {
@@ -31,6 +31,7 @@ export const useLayerStore = defineStore('layer', () => {
   }
   const fetchLayers = async () => {
     layers.value = await getLayers().then(res => res.data);
+    console.log('layer', layers.value);
     clearMap();
     for (const layer of layers.value) {
       const { type, name, children, isviewed } = layer;

@@ -350,8 +350,10 @@ export async function updateLayerName (layerInfo, corporation) {
     const { name, id } = layerInfo;
     const query = `UPDATE layer SET name = $1 WHERE name = $2 AND corporation = $3`;
     const query2 = `UPDATE layer_new SET name = $1 WHERE name = $2 AND corporation = $3`;
+    const query3 = `UPDATE point SET layer = $1 WHERE layer = $2 AND corporation = $3`;
     await pool_client.query(query, [name, id, corporation]);
     await pool_client.query(query2, [name, id, corporation]);
+    await pool_client.query(query3, [name, id, corporation]);
   } catch (err) {
     console.error(err);
   } finally {
