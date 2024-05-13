@@ -1,10 +1,12 @@
 <template>
   <div class="popup">
-    点位名称：{{ name }}
-    <br>
-    经度： {{ x }}
-    <br>
-    纬度： {{ y }}
+    <div class="content">
+      <h3>点位信息</h3>
+    <p>点位名称：{{ name }}</p>
+
+    <p>经度： {{ x }}</p>
+    <p>纬度： {{ y }}</p>
+    </div>
     <div class="close" @click="close">X</div>
   </div>
 </template>
@@ -25,10 +27,15 @@ const close = () => {
 </script>
 
 <style scoped>
+.content {
+  display: flex;
+  flex-direction: column;
+}
 .popup {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* flex-direction: column; */
+  /* justify-content: center; */
+  /* align-items: center; */
   position: absolute;
   left: 50%;
   top: 50%;
@@ -47,7 +54,7 @@ const close = () => {
   border-top-color:white;
   position: absolute;
   left: 50%;
-  top: 95%;
+  top: 98%;
   transform: translate(-50%);
 }
 .close {
