@@ -2,8 +2,8 @@
   <div class="manager">
     <!-- <div class="search"></div> -->
     <div class="table">
-      <!-- <el-button type="primary">上传数据</el-button> -->
-      <el-button @click="updateData" type="primary">同步数据</el-button>
+      <el-button type="primary" @click="upload">上传数据</el-button>
+      <el-button @click="updateData">同步数据</el-button>
       <DataTable class="data-table"></DataTable>
       <div class="pagination">
         <div class="total">共{{ total }}条</div>
@@ -43,7 +43,7 @@ const managerStore = useManagerStore();
 const { getTableData, getstotal } = managerStore;
 const { total } = storeToRefs(managerStore);
 const dialogStore = useDialogStore();
-const { openUpdateDialog } = dialogStore;
+const { openUpdateDialog, openUploadDialog } = dialogStore;
 const currentPage = ref(1);
 const small = ref(false);
 const background = ref(false);
@@ -64,6 +64,9 @@ watch(itemQuantity, async (newVal, oldVal) => {
     itemQuantity: itemQuantity.value,
   });
 });
+const upload = () => {
+  openUploadDialog();
+}
 const updateData = () => {
   openUpdateDialog();
 };

@@ -601,3 +601,46 @@ export async function dropNewLayer (layerName, corporation) {
     }
   }
 }
+
+export async function uploadPoint (data, corporation) {
+  let pool_client;
+  try {
+    pool_client = await pool.connect();
+    const { points, layers } = data;
+    const values = points.map(obj => `('${obj.title}', '${obj.locationx}', ${obj.locationy}, '${obj.category}', '${corporation}', '${obj.layer}', '${obj.address}', '${obj.description}')`).join(',');
+    const query = `
+      INSERT INTO point (title, locationx, locationy, category, corporation, layer, address, description)
+      VALUES ${values};
+    `;
+    await pool_client.query(query);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const date = now.getDate();
+    const time = `${year}-${month}-${date}`;
+    const layersQuery = layers.map(layer => {
+      return pool_client.query('INSERT INTO layer_new (name, type, quantity, corporation, updatetime) VALUES ($1, $2, $3, $4, $5)', [
+        layer[0],
+        'point',
+        layer[1],
+        corporation,
+        time,
+      ])
+    });
+    await Promise.all(layersQuery);
+    // const query = `
+    // DELETE FROM layer_new WHERE name = $1 And corporation = $2;
+    // `;
+    // await pool_client.query(query, [layerName, corporation]);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (pool_client) {
+      try {
+          pool_client.release(); // 释放数据库连接
+      } catch (err) {
+          console.error('Error releasing pool client:', err);
+      }
+    }
+  }
+}

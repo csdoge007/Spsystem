@@ -21,10 +21,12 @@
   <LayerInfo v-if="layerDialog"></LayerInfo>
   <ReNameInfo :layerId="reNameId"></ReNameInfo>
   <DataUpdate v-if="updateDialog"></DataUpdate>
+  <Upload v-if="uploadDialog"></Upload>
 </template>
 
 <script setup>
 import DataUpdate from '@/views/DataManager/DataUpdate/index.vue';
+import Upload from '@/components/Upload/index.vue';
 import DataManager from '../DataManager/index.vue';
 import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
@@ -35,7 +37,7 @@ import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue';
 import Header from '../Header/index.vue';
 const dialogStore = useDialogStore();
-const { reNameId, layerDialog, updateDialog} = storeToRefs(dialogStore);
+const { reNameId, layerDialog, updateDialog, uploadDialog } = storeToRefs(dialogStore);
 defineOptions({
   name: 'Admin'
 });

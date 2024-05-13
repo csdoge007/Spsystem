@@ -4,7 +4,14 @@ export const useDialogStore = defineStore('dialog', () => {
   const layerDialog = ref(false);
   const reNameDialog = ref(false);
   const updateDialog = ref(false);
+  const uploadDialog = ref(false);
   const reNameId = ref(-1);
+  const openUploadDialog = () => {
+    uploadDialog.value = true;
+  };
+  const closeUploadDialog = () => {
+    uploadDialog.value = false;
+  };
   const openUpdateDialog = () => {
     updateDialog.value = true;
   };
@@ -26,5 +33,5 @@ export const useDialogStore = defineStore('dialog', () => {
   const closeReNameDialog = () => {
     reNameDialog.value = false;
   };
-  return { updateDialog, openUpdateDialog, closeUpdateDialog, changeReNameId, reNameId, reNameDialog, openReNameDialog, closeReNameDialog, layerDialog, openLayerDialog, closeLayerDialog };
+  return { closeUploadDialog, openUploadDialog, uploadDialog, updateDialog, openUpdateDialog, closeUpdateDialog, changeReNameId, reNameId, reNameDialog, openReNameDialog, closeReNameDialog, layerDialog, openLayerDialog, closeLayerDialog };
 });

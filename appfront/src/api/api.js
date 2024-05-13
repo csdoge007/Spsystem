@@ -103,3 +103,7 @@ export const updateUserInfo = (userInfo) => axios.put('/updateUserInfo', {
 });
 
 export const getUserName = () => axios.get('/getUserName');
+
+export const upload = (data) => axios.post('/upload', {
+  data,
+});

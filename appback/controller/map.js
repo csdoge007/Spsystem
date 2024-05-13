@@ -1,5 +1,7 @@
 import pool from "../config.js";
 import convert from "../utils/convert.js";
+import XLSX from 'xlsx';
+import multiparty from 'multiparty';
 import { 
   circleSelectPoi, 
   readLayers, 
@@ -20,7 +22,8 @@ import {
   selectCurrentItems,
   getLayerData,
   updateLayerNew,
-  dropNewLayer, } from "../service/map.js";
+  dropNewLayer, 
+  uploadPoint} from "../service/map.js";
 import coordtransform from 'coordtransform';
 export async function getPoi(req, res, next) {
   let pool_client;
@@ -487,3 +490,38 @@ export async function deleteNewLayer (req, res, next) {
   }
 }
 
+export async function upload (req, res, next) {
+  try {
+    const { corporation } = req;
+    const { data } = req.body;
+    // console.log('data', data);
+    const uploadData = {};
+    const pointsData = data.map(point => {
+      return {
+        title: point['点位名称'],
+        locationx: point['经度'],
+        locationy: point['纬度'],
+        category: point['点位类别'],
+        layer: point['所属图层'],
+        corporation: point['所属公司'],
+        address: point['具体地址'] ? point['具体地址'] : '',
+        description: point['描述'] ? point['描述'] : '',
+      }
+    });
+    uploadData.points = pointsData;
+    const layersMap = new Map();
+    pointsData.forEach((point) => {
+      layersMap.set(point.layer, ( layersMap.get(point.layer) || 0) + 1);
+    });
+    const layers = [];
+    for (const [key, value] of layersMap) {
+      layers.push([key, value]);
+    }
+    uploadData.layers = layers;
+    await uploadPoint(uploadData, corporation);
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error" + error);
+  }
+}
