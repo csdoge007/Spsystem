@@ -173,14 +173,15 @@ const showSearchPoi = (data, wrappedLayer) => {
   const markers = layerGroup();
   baseLayers['searchLayer'] = markers;
   data.forEach(dataPoint => {
-    const { locationx, locationy, name } = dataPoint;
+    const { locationx, locationy, name, type } = dataPoint;
     // const poiPosition = coordtransform.wgs84togcj02(locationx, locationy); 
     
     // const poiPosition = coordtransform.gcj02towgs84(locationx, locationy); 
 
     const poiPosition = [locationx, locationy]; 
+    const customPopupContent = `<div><h3>POI信息</h3><p>名称：${name}</p><p>类型：${type}</p><p>经度：${locationx}</p><p>纬度：${locationy}</p></div>`;
     let markerLayer = marker([poiPosition[1], poiPosition[0]]).addTo(markers);
-    markerLayer.bindPopup(name);
+    markerLayer.bindPopup(customPopupContent);
     markerLayer.openPopup();
   });
   map.addLayer(markers);

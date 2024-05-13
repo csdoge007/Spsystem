@@ -9,8 +9,8 @@
         <Header :routeName="routeName"></Header>
       </el-header>
       <el-main>
-        <router-view v-slot="{ Component }"> 
-          <keep-alive v-if="Component == DataManager">
+        <router-view v-slot="{ Component, route }"> 
+          <keep-alive v-if="route.meta.alias !== '数据管理'">
             <component :is="Component" />
           </keep-alive>
           <component :is="Component" v-else />
