@@ -132,9 +132,11 @@ watch(() => recommendStore.thermalData, (newValue) => {
   getKriging(newValue);
   if (polygonBox) {
     map.removeLayer(polygonBox);
+    polygonBox = null;
   }
   if (polygonDrawed) {
     map.removeLayer(polygonDrawed);
+    polygonDrawed = null;
     recommendStore.clearBox();
   }
   if (baseLayers['recommendLayer']) {
