@@ -1,6 +1,6 @@
 <template>
   <div class="collapse" ref="collapseContent">
-    <h1 ref="title">选址评分结果如下</h1>
+    <h1 ref="title">选址评估结果如下</h1>
     <el-scrollbar :height="scrollHeight">
       <el-collapse accordion @change="changeActiveItem" v-model="activeItem">
         <el-collapse-item v-for="(point, idx) in selectStore.selectedPoints" :key="idx" :name="idx">
