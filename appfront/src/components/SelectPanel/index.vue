@@ -12,14 +12,12 @@
                 :category="point.category">
               </PanelItem>
             </template>
-            <component 
-              :is="RadarChart"
+            <RadarChart
               v-if="activeItem === idx"
               :name="point.name"
               :radius="point.radius"
-              :category="point.category"
-            >
-            </component>
+              :category="point.category">
+            </RadarChart>
         </el-collapse-item>
       </el-collapse>
     </el-scrollbar>
