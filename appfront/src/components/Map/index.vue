@@ -152,7 +152,7 @@ watch(() => recommendStore.thermalData, (newValue) => {
         html: svgTypes[i],
       });
     const markerLayer = marker([y, x], { icon: svgIcon, name: resultSums, type: 'recommend' }).addTo(markers);
-    const customPopupContent = `<div><h3>点位坐标</h3><p>经度：${x}</p><p>纬度：${y}</p></div>`;
+    const customPopupContent = `<div><h3>点位坐标</h3><p>经度：${x}</p><p>纬度：${y}</p><p>可达性指数：${resultSums}</p></div>`;
     markerLayer.bindPopup(customPopupContent);
     if (i === 0) map.panTo([y, x]);
   }
