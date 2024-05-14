@@ -34,12 +34,17 @@ defineOptions({
 const managerStore = useManagerStore();
 const { currentPage, itemQuantity } = storeToRefs(managerStore);
 const filteredData = ref([]);
+const dataType = {
+  'point': '点数据',
+  'line': '线数据',
+  'surface': '面数据'
+}
 watch(() => managerStore.tableData, (newVal) => {
   filteredData.value = newVal.map((item, idx) => {
     return {
       number: (currentPage.value - 1) * itemQuantity.value + idx + 1,
       name: item.name,
-      dataType: item.type,
+      dataType: dataType[item.type],
       quantity: item.quantity,
       lastTime: item.updatetime,
       rankStatus: item.status ? '处理成功' : '未处理',
