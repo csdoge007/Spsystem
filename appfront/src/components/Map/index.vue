@@ -121,8 +121,9 @@ const getKriging = (pointsData) => {
   }
   let imageBounds = [[ylim[0], xlim[0]], [ylim[1], xlim[1]]];
   if (thermalMap) {
-    map.removeLayer(thermalMap);
-  }
+    imageLayerGroup.removeLayer(thermalMap);
+    thermalMap = null;
+  } 
   thermalMap = imageOverlay(returnImgae(), imageBounds, { opacity: 0.8 }).addTo(imageLayerGroup);
   console.log('range', range);
   console.log('imageBounds', imageBounds);
@@ -309,7 +310,7 @@ watch(() => props.isrecommended, (newValue) => {
       imageLayerGroup.addTo(map);
     }
     if (thermalMap) {
-      thermalMap.addTo(map);
+      thermalMap.addTo(imageLayerGroup);
     }
     if (polygonBox) {
       polygonBox.addTo(map);
@@ -328,7 +329,7 @@ watch(() => props.isrecommended, (newValue) => {
       map.removeLayer(imageLayerGroup);
     }
     if (thermalMap) {
-      map.removeLayer(thermalMap);
+      imageLayerGroup.removeLayer(thermalMap);
     }
     if (polygonBox) {
       map.removeLayer(polygonBox);
