@@ -2,7 +2,7 @@
 import Axios from 'axios';
 import router from '@/router/index';
 Axios.defaults.timeout = 60000;
-const baseURL = 'http://localhost:3000'
+const baseURL = '/api'
 const axiosInstance = Axios.create({
     withCredentials: true,
     baseURL,
