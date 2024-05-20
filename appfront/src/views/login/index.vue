@@ -92,7 +92,6 @@ const onLogin = async (formEl) => {
 const regist = () => {
   currentPage.value = 1;
 };
-
 </script>
 
 <style scoped>

@@ -24,6 +24,9 @@ import { useSelectStore, useRecommendStore } from '@/stores/select';
 import Popup from '@/components/Popup/index.vue';
 import * as turf from '@turf/turf';
 import kriging from '@sakitam-gis/kriging';
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 defineOptions({
   name: 'Map'
 })
@@ -56,6 +59,17 @@ L.Popup.prototype._animateZoom = function (e) {
     anchor = this._getAnchor()
   L.DomUtil.setPosition(this._container, pos.add(anchor))
 }
+let DefaultIcon = L.icon({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 watch(() => selectStore.selectedPoints, (newPoints) => {
   if (props.isEdit) return;
   if (baseLayers['selectedLayer']) {

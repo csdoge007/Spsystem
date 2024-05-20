@@ -83,6 +83,14 @@ app.get('/getUserInfo', authenticateToken, getUserInfo);
 app.put('/updateUserInfo',authenticateToken, updateUserInfo);
 app.get('/getUserName', authenticateToken, getUserName);
 app.post('/upload', authenticateToken, upload);
+app.get('/api/user', (req, res) => {
+  res.json({
+    data: [
+      {name: 'test'}
+    ],
+    code: 200
+  })
+});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });
