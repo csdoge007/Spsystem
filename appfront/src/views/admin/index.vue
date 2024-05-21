@@ -27,7 +27,6 @@
 <script setup>
 import DataUpdate from '@/views/DataManager/DataUpdate/index.vue';
 import Upload from '@/components/Upload/index.vue';
-import DataManager from '../DataManager/index.vue';
 import Navigator from '@/components/Navigator.vue';
 import LayerInfo from '@/components/EditPanel/BasicManager/ManagerHeader/CreateLayerInfo/index.vue';
 import ReNameInfo from '@/components/EditPanel/BasicManager/EditItem/EditItemHeader/ReNameInfo/index.vue';
