@@ -33,33 +33,9 @@
       
 
     <script>
-    let width = document.querySelector('body').clientWidth;
-    console.log('width', width);
-    console.log('devicePixelRatio', window.devicePixelRatio);
-    let map = new L.Map('map');
-    let Layer = new L.TileLayer('http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}',{
-      cacheControl: 'public,max-age=3600' 
-    });
-    Layer.addTo(map);
-    let y = 32.1141;
-    let x = 118.93198;
-    let xl = 118.95;
-    map.setView([32.1141, 118.93198], 11);
-    let markerLayer = L.marker([32.1141, 118.83198]).addTo(map)    
-    markerLayer.bindPopup('你好');
-    markerLayer.openPopup();;
-    L.popup()
-     .setLatLng([y, x])
-     .setContent('hello')
-     .openOn(map);
-    let btn = document.querySelector('.btn');
-    btn.addEventListener('click', (e) => {
-      L.popup()
-        .setLatLng([y, x])
-        .setContent('hellol')
-        .openOn(map);
-      e.stopPropagation();
-    })
+    console.log(document.documentElement.scrollWidth, document.documentElement.clientWidth);
+    console.log(document.documentElement.scrollHeight, document.documentElement.clientHeight);
+
     </script>
   </body>
 </html>

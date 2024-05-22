@@ -32,7 +32,7 @@ import { ArrowDown } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
+import {  onBeforeMount } from 'vue';
 const router = useRouter();
 defineOptions({
   name: 'Header',
@@ -49,7 +49,7 @@ const props = defineProps({
 const handleCommand = () => {
   router.push({ path: '/' })
 };
-onMounted(async () => {
+onBeforeMount(async () => {
   await setUserName();
 });
 </script>

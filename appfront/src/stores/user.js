@@ -4,7 +4,7 @@ import { getUserName } from '@/api/api';
 export const useLoginStore = defineStore('login', () => {
   const currentPage = ref(0);
   const username = ref('');
-  const isAdmin = ref(false);
+  const isAdmin = ref(true);
   const setCurrentPage = (page) => {
     currentPage.value = page;
   }

@@ -10,10 +10,13 @@
       </el-header>
       <el-main>
         <router-view v-slot="{ Component, route }"> 
-          <keep-alive v-if="route.meta.alias !== '数据管理'">
+          <!-- <keep-alive v-if="route.meta.alias !== '数据管理'">
             <component :is="Component" />
           </keep-alive>
-          <component :is="Component" v-else />
+          <component :is="Component" v-else /> -->
+          <keep-alive exclude="DataManager">
+            <component :is="Component" />
+          </keep-alive>
         </router-view>
       </el-main>
     </el-container>

@@ -143,6 +143,7 @@ const getKriging = (pointsData) => {
   console.log('imageBounds', imageBounds);
 };
 watch(() => recommendStore.thermalData, (newValue) => {
+  if (props.isEdit) return; 
   console.log('newValue', newValue);
   getKriging(newValue);
   if (polygonBox) {

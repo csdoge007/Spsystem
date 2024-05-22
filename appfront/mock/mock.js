@@ -2,12 +2,9 @@ export default [
   {
     url: "/api/getGroups",
     method: "get",
+    statusCode: 200,
     response: () => {
-      return {
-        code: 200,
-        message: "ok",
-        data: ["tom", "jerry"]
-      };
+      return  ["tom", "jerry"];
     }
   }
 ];
