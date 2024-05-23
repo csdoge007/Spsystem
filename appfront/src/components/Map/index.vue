@@ -59,6 +59,7 @@ L.Popup.prototype._animateZoom = function (e) {
     anchor = this._getAnchor()
   L.DomUtil.setPosition(this._container, pos.add(anchor))
 }
+console.log('markerIcon', markerIcon);
 let DefaultIcon = L.icon({
     iconUrl: markerIcon,
     iconRetinaUrl: markerIcon2x,
@@ -70,6 +71,8 @@ let DefaultIcon = L.icon({
     shadowSize: [41, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+L.Draw.Marker.prototype.options.icon = DefaultIcon;
+
 watch(() => selectStore.selectedPoints, (newPoints) => {
   if (props.isEdit) return;
   if (baseLayers['selectedLayer']) {
@@ -437,6 +440,8 @@ const addDrawEvents = async () => {
   });
 };
 onMounted(async () => {
+  console.log('L.Draw', L.Draw);
+  console.log('L', L);
   initMap();
   try {
     const { data } = await getPoi();
