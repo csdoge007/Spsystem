@@ -181,7 +181,7 @@ const input = ref('');
 const showSearchPoi = (data, wrappedLayer) => {
   map.eachLayer(function (layer) {
     if (!props.isEdit) {
-      if (layer !== Layer && layer !== baseLayers['selectedLayer']) { 
+      if (layer !== Layer && layer !== baseLayers['selectedLayer'] && layer.options.type !== 'rank') { 
         map.removeLayer(layer);
       }
     } else {

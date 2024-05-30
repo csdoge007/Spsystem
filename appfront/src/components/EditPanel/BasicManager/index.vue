@@ -2,13 +2,13 @@
   <div class="basic">
     <ManagerHeader></ManagerHeader>
     <el-scrollbar height="570px">
-      <el-tree
+      <!-- <el-tree
         :data="data"
         :props="{ class: customNodeClass }"
       >
         <template #default="{ data }">
           <el-icon v-if="data.isFile"><Folder /></el-icon>
-          <el-collapse accordion @change="toggleItem" v-if="data.id===2" class="tree-collapse">
+          <el-collapse accordion @change="toggleItem" v-if="data.id===2" class="tree-collapse" v-model="activeName">
             <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
               <div class="triangle"></div>
               <template #title>
@@ -18,8 +18,8 @@
             </el-collapse-item>
           </el-collapse>
         </template>
-      </el-tree>
-      <el-collapse accordion @change="toggleItem">
+      </el-tree> -->
+      <el-collapse accordion @change="toggleItem" v-model="activeName">
         <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>
           <template #title>
@@ -45,9 +45,10 @@ defineOptions({
 });
 const layerStore = useLayerStore();
 const { layers } = storeToRefs(layerStore);
-const activeName = ref(-1);
+const activeName = ref('');
 const toggleItem = (name) => {
-  activeName.value = name;
+  // activeName.value = name;
+  console.log('activeName', activeName.value, name);
 }
 const data = [
   {

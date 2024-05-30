@@ -113,7 +113,7 @@ export async function getAccessibility(req, res, next) {
               ST_SetSRID(ST_MakePoint(x_val, y_val), 4326)::geography, 
               radius_val
             ) LOOP 
-          SELECT COUNT(*) INTO poi_count 
+          SELECT COUNT(*) + 1 INTO poi_count 
           FROM njpoi_2020_new 
           WHERE ST_DWithin(njpoi_2020_new.geom::geography, poi_rec.geom::geography, radius_val)
           AND substring(type FROM '([^;]+)') = poitype_val;
@@ -138,6 +138,7 @@ export async function getAccessibility(req, res, next) {
     // 查询layer名为layer的点
     const resultPoints = await pool_client.query('SELECT * FROM point WHERE layer = $1 And category = $2 And corporation = $3', [layer, type, corporation]);
     const points = resultPoints.rows;
+
     const reachabilityQueries = points.map(point => {
       const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
       return pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], Number(radius), type]);
@@ -154,6 +155,22 @@ export async function getAccessibility(req, res, next) {
         radius: Number(radius),
       }
     });
+
+    // const resultSums = [];
+    // for (let idx = 0; idx < points.length; idx++) {
+    //   const point = points[idx];
+    //   const wgs84 = coordtransform.gcj02towgs84(point.locationx, point.locationy);
+    //   const result = await pool_client.query(`SELECT calculate_sum($1, $2, $3, $4) AS result_sum;`, [ wgs84[0],  wgs84[1], Number(radius), type])
+    //   resultSums.push({
+    //     resultSums: result.rows[0].result_sum.toFixed(2),
+    //     name: points[idx].title,
+    //     category: points[idx].category,
+    //     x: points[idx].locationx,
+    //     y: points[idx].locationy,
+    //     radius: Number(radius),
+    //   })
+    // }
+
     resultSums.sort((a, b) => b.resultSums - a.resultSums);
     const query2 = `
     UPDATE layer_new
@@ -506,6 +523,7 @@ export async function upload (req, res, next) {
         corporation: point['所属公司'],
         address: point['具体地址'] ? point['具体地址'] : '',
         description: point['描述'] ? point['描述'] : '',
+        isupload: true,
       }
     });
     uploadData.points = pointsData;

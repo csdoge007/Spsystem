@@ -90,7 +90,7 @@ export async function getElements (corporation) {
   try {
     pool_client = await pool.connect();
     const query = `
-    SELECT * FROM point WHERE corporation=$1;
+    SELECT * FROM point WHERE corporation=$1 And isupload = false;
     `;
     const result = await pool_client.query(query, [corporation]);
     return result.rows;
@@ -216,6 +216,7 @@ async function getResidentQuantity (pointInfo) {
       )
     `;
     const { rows } = await pool_client.query(query, [x, y, radius]);
+    console.log('居民区数量', rows[0].re_count);
     return rows[0].re_count;
   } catch (err) {
     console.error(err);
@@ -255,6 +256,7 @@ async function getCompetitorQuantity (pointInfo) {
       ) AND substring(type FROM '([^;]+)') = $4;
     `;
     const { rows } = await pool_client.query(query, [x, y, radius, category]);
+    console.log('竞争者数量', rows[0].com_count);
     return rows[0].com_count;
   } catch (err) {
     console.error(err);
@@ -276,7 +278,7 @@ export async function getCompetitorScore (pointInfo) {
   const density = num / 6587; 
   const qRadius = radius / 1000;
   const avq =  quantity / (Math.PI * Math.pow(qRadius, 2));
-  const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (avq - density)));
+  const score = 50 + 50 / (1 + Math.pow(Math.E,-0.5 * (density - avq)));
   return Math.round(score * 100) / 100;
 }
 
@@ -387,7 +389,7 @@ export async function getPointsAccess ({pointsInfo, radius, type}) {
               ST_SetSRID(ST_MakePoint(x_val, y_val), 4326)::geography, 
               radius_val
             ) LOOP 
-          SELECT COUNT(*) INTO poi_count 
+          SELECT COUNT(*) + 1 INTO poi_count 
           FROM njpoi_2020_new 
           WHERE ST_DWithin(njpoi_2020_new.geom::geography, poi_rec.geom::geography, radius_val)
           AND substring(type FROM '([^;]+)') = poitype_val;
@@ -591,6 +593,17 @@ export async function dropNewLayer (layerName, corporation) {
     DELETE FROM layer_new WHERE name = $1 And corporation = $2;
     `;
     await pool_client.query(query, [layerName, corporation]);
+    const query1 = `
+    SELECT COUNT(*) AS re_count FROM layer WHERE name = $1 And corporation = $2;
+    `
+    const res1 = await pool_client.query(query1, [layerName, corporation]);
+    if (res1.rows[0].re_count == 0) {
+      // 说明该图层是上传的数据
+      const query2 = `
+        DELETE FROM point WHERE layer = $1 And corporation = $2;
+      `;
+      await pool_client.query(query2, [layerName, corporation]);
+    }
   } catch (err) {
     console.error(err);
   } finally {
@@ -609,9 +622,9 @@ export async function uploadPoint (data, corporation) {
   try {
     pool_client = await pool.connect();
     const { points, layers } = data;
-    const values = points.map(obj => `('${obj.title}', '${obj.locationx}', ${obj.locationy}, '${obj.category}', '${corporation}', '${obj.layer}', '${obj.address}', '${obj.description}')`).join(',');
+    const values = points.map(obj => `('${obj.title}', '${obj.locationx}', ${obj.locationy}, '${obj.category}', '${corporation}', '${obj.layer}', '${obj.address}', '${obj.description}', '${obj.isupload}')`).join(',');
     const query = `
-      INSERT INTO point (title, locationx, locationy, category, corporation, layer, address, description)
+      INSERT INTO point (title, locationx, locationy, category, corporation, layer, address, description, isupload)
       VALUES ${values};
     `;
     await pool_client.query(query);

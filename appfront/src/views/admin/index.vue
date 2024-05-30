@@ -9,7 +9,7 @@
         <Header :routeName="routeName"></Header>
       </el-header>
       <el-main>
-        <router-view v-slot="{ Component, route }"> 
+        <router-view v-slot="{ Component }"> 
           <!-- <keep-alive v-if="route.meta.alias !== '数据管理'">
             <component :is="Component" />
           </keep-alive>

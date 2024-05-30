@@ -2,7 +2,7 @@
   <div class="radar-container">
     <div class="radar-left">
       <div class="title">| 选址评分雷达图</div>
-      <div id="radar"></div>
+      <div :id="name" class="radar"></div>
     </div>
     <RatePanel v-if="viewRated" v-bind="scores"></RatePanel>
   </div>
@@ -47,7 +47,7 @@ const initChart = () => {
   ];
 
   const chart = new Chart({
-    container: 'radar',
+    container: props.name,
     autoFit: true,
     width: 285,
     height: 230
@@ -106,7 +106,7 @@ const initChart = () => {
   chart.render();
 }
 onMounted(async () => {
-  const loadingInstance = ElLoading.service({ target: '#radar', background:'#f6f6f6' });
+  const loadingInstance = ElLoading.service({ target: '.radar', background:'#f6f6f6' });
   const scoreVals = await getScores({name: props.name, radius:props.radius, category: props.category});
   Object.assign(scores, scoreVals.data);
   console.log('score', scoreVals.data);
@@ -125,7 +125,7 @@ onMounted(async () => {
   .radar-left {
     display: flex;
     flex-direction: column;
-    #radar {
+    .radar {
       width: 285px; 
       height: 230px;
     }

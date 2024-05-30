@@ -52,7 +52,8 @@ watch(() => managerStore.tableData, (newVal) => {
   });
 });
 const onClick = async (row, col, cell, event) => {
-  if (col.id === "el-table_1_column_7" && event.target.tagName === 'SPAN') {
+  if (col.property === 'operation' && event.target.tagName === 'SPAN') {
+    console.log('abd');
     await deleteNewLayer(row.name);
     await managerStore.getTableData();
     await managerStore.getstotal();

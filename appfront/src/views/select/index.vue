@@ -11,8 +11,12 @@
         </el-tab-pane>
       </el-tabs>
       <Map :isEdit="false" class="map" :isrecommended="activeName==='recommended'"></Map>
-      <SelectForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }" v-if="activeName==='evaluate'"></SelectForm>
-      <RecommendForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }" v-if="activeName==='recommended'"></RecommendForm>
+      <keep-alive>
+        <SelectForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }" v-if="activeName==='evaluate'"></SelectForm>
+      </keep-alive>
+      <keep-alive>
+        <RecommendForm :layers="layers" @toLeft="toLeft" :class="{ left: !isHidden }" v-if="activeName==='recommended'"></RecommendForm>
+      </keep-alive>
     </div>
   </div>
 </template>
@@ -23,7 +27,7 @@ import LeftSlide from '@/components/LeftSlide.vue';
 import SelectForm from '@/components/SelectForm/index.vue';
 import RecommendForm from '@/components/SelectForm/components/RecommendForm.vue';
 import SelectPanel from '@/components/SelectPanel/index.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onActivated } from 'vue';
 import { useSelectStore } from '@/stores/select';
 import { storeToRefs } from 'pinia';
 defineOptions({
@@ -47,6 +51,9 @@ const activeName = ref('evaluate');
 onMounted(async () => {
   await fetchLayers();
 });
+onActivated(async () => {
+  await fetchLayers();
+})
 </script>
 <style scoped>
 .select {

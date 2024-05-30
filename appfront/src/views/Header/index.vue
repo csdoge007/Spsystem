@@ -31,6 +31,7 @@ import imgUrl from './avator.jpg';
 import { ArrowDown } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/user';
+import { useSelectStore } from '@/stores/select';
 import { storeToRefs } from 'pinia';
 import {  onBeforeMount } from 'vue';
 const router = useRouter();
@@ -47,7 +48,9 @@ const props = defineProps({
   },
 });
 const handleCommand = () => {
-  router.push({ path: '/' })
+  useSelectStore().closePopup();
+  useSelectStore().importSelectedPoints([]);
+  router.push({ path: '/' });
 };
 onBeforeMount(async () => {
   await setUserName();

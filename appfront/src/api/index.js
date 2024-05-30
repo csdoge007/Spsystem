@@ -1,7 +1,7 @@
 // import Vue from 'vue'
 import Axios from 'axios';
 import router from '@/router/index';
-Axios.defaults.timeout = 60000;
+Axios.defaults.timeout = 600000;
 const baseURL = '/api'
 const axiosInstance = Axios.create({
     withCredentials: true,
