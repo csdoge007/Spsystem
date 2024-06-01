@@ -107,3 +107,5 @@ export const getUserName = () => axios.get('/getUserName');
 export const upload = (data) => axios.post('/upload', {
   data,
 });
+
+export const getGroupsData = () => axios.get('/getGroupsData');

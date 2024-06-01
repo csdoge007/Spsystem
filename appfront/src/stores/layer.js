@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
-import { getLayers, getCurrentItems } from '../api/api';
+import { getLayers, getCurrentItems, getGroupsData } from '../api/api';
 import { layerGroup, marker, Marker } from 'leaflet';
 // import { usePointStore } from './point';
 import { getTotal } from '@/api/api';
@@ -10,6 +10,7 @@ export const useLayerStore = defineStore('layer', () => {
   const map = ref(null);
   const editingPoint = ref(null);
   const editing = ref(false);
+  const groupsData = ref([]);
   const changeLayerName = (name, id) => {
     const layer = layers.value.filter(item => item.name === id)[0];
     layer.name = name;
@@ -30,6 +31,8 @@ export const useLayerStore = defineStore('layer', () => {
     map.value = mp;
   }
   const fetchLayers = async () => {
+    groupsData.value = await getGroupsData().then(res => res.data);
+    console.log('groups', groupsData);
     layers.value = await getLayers().then(res => res.data);
     console.log('layer', layers.value);
     clearMap();
@@ -76,7 +79,7 @@ export const useLayerStore = defineStore('layer', () => {
     const layer = layers.value.filter(layer => layer.name === name)[0];
     layer.isviewed = !layer.isviewed;
   }
-  return { changeLayerName, map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
+  return { groupsData, changeLayerName, map, editing, edited, clearEditingPoint, setEditingPoint, layers, fetchLayers, drawElements, clearElements, changeLayerView, setEditedMap };
 });
 
 export const useManagerStore = defineStore('manager', () => {

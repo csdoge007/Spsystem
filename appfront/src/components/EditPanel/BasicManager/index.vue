@@ -2,14 +2,18 @@
   <div class="basic">
     <ManagerHeader></ManagerHeader>
     <el-scrollbar height="570px">
-      <!-- <el-tree
-        :data="data"
+      <el-tree
+        :data="groupsData"
         :props="{ class: customNodeClass }"
       >
         <template #default="{ data }">
           <el-icon v-if="data.isFile"><Folder /></el-icon>
-          <el-collapse accordion @change="toggleItem" v-if="data.id===2" class="tree-collapse" v-model="activeName">
-            <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
+          <span v-if="data.isFile" class="group-name">{{ data.groupName }}</span>
+          <span v-if="data.isFile" class="quantity" style="margin-left: 4px; color: rgb(172,175,189)">
+            ({{ data.quantity }})
+          </span>
+          <el-collapse accordion @change="toggleItem" v-if="data.isCollapse" class="tree-collapse" v-model="activeName">
+            <el-collapse-item v-for="layer in data.items" :key="layer.name" :name="layer.name">
               <div class="triangle"></div>
               <template #title>
                 <EditItemHeader class="edit-item-header__1" v-bind="layer" :isActived="activeName === layer.name"></EditItemHeader>
@@ -18,7 +22,7 @@
             </el-collapse-item>
           </el-collapse>
         </template>
-      </el-tree> -->
+      </el-tree>
       <el-collapse accordion @change="toggleItem" v-model="activeName">
         <el-collapse-item v-for="layer in layers" :key="layer.name" :name="layer.name">
           <div class="triangle"></div>
@@ -44,40 +48,13 @@ defineOptions({
   name: 'BasicManager',
 });
 const layerStore = useLayerStore();
-const { layers } = storeToRefs(layerStore);
+const { layers, groupsData } = storeToRefs(layerStore);
 const activeName = ref('');
 const toggleItem = (name) => {
   // activeName.value = name;
   console.log('activeName', activeName.value, name);
 }
-const data = [
-  {
-    id: 1,
-    label: 'Level one 1',
-    isFile: true,
-    children: [
-      {
-        id: 3,
-        label: 'Level 3',
-        isFile: true,
-        children: [
-          {
-            id: 4,
-            label: 'Level 4',
-          },
-          {
-            id: 5,
-            label: 'Level 5',
-          }
-        ]
-      },
-      {
-        id: 2,
-        label: 'Level two 1-1',
-      },
-    ],
-  },
-]
+
 const customNodeClass = (data) => {
   if (!data.isFile) {
     return 'not-file';
@@ -87,6 +64,9 @@ const customNodeClass = (data) => {
 </script>
 
 <style scoped>
+.group-name {
+  margin-left: 10px;
+}
 .basic {
   margin: 10px;
   height: 100%;
