@@ -10,7 +10,7 @@
 
 <script setup>
 import { Chart } from '@antv/g2';
-import { onMounted, reactive, ref } from 'vue';
+import { onActivated, onDeactivated, reactive, ref } from 'vue';
 import { getScores } from '@/api/api';
 import { ElLoading } from 'element-plus'
 import RatePanel from './RatePanel/index.vue';
@@ -105,15 +105,37 @@ const initChart = () => {
   });
   chart.render();
 }
-onMounted(async () => {
-  const loadingInstance = ElLoading.service({ target: '.radar', background:'#f6f6f6' });
-  const scoreVals = await getScores({name: props.name, radius:props.radius, category: props.category});
-  Object.assign(scores, scoreVals.data);
-  console.log('score', scoreVals.data);
-  initChart();
-  loadingInstance.close();
-  viewRated.value = true;
+
+let loadingInstance = null;
+let loadingFlag = -1; // -1表示未开始请求数据， 0表示开始请求数据但还未请求完毕， 1表示请求完毕。
+onActivated(async () => {
+  if (loadingFlag === -1) {
+    loadingInstance = ElLoading.service({ target: '.radar', background:'#f6f6f6' });
+    loadingFlag = 0;
+    const scoreVals = await getScores({name: props.name, radius:props.radius, category: props.category});
+    loadingFlag = 1;
+    Object.assign(scores, scoreVals.data);
+    if (loadingInstance) {
+      initChart();
+      loadingInstance.close();
+      loadingInstance = null;
+      viewRated.value = true;
+    }
+  } else if (loadingFlag = 0) {
+    loadingInstance = ElLoading.service({ target: '.radar', background:'#f6f6f6' });
+  } else {
+    initChart();
+    viewRated.value = true;
+  }
 });
+
+onDeactivated(() => {
+  if (loadingInstance) {
+    loadingInstance.close();
+    loadingInstance = null;
+  }
+})
+
 </script>
 
 <style lang="scss" scoped>

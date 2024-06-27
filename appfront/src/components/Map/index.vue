@@ -264,13 +264,19 @@ const buildLayerTree = (data) => {
 const showPopup = () => {
   const containerPosition = map.latLngToContainerPoint(pointLatLng.value);
   const { x, y } = containerPosition;
-  nextTick(() => {
-    const infoEl = popup.value?.$el;
-    if (infoEl) {
-      infoEl.style.left = `${x}px`;
-      infoEl.style.top = `${y}px`;
-    }
-  });
+  const infoEl = popup.value?.$el;
+  if (infoEl) {
+    infoEl.style.left = `${x}px`;
+    infoEl.style.top = `${y}px`;
+  } else {
+    nextTick(() => {
+      const infoEl = popup.value?.$el;
+      if (infoEl) {
+        infoEl.style.left = `${x}px`;
+        infoEl.style.top = `${y}px`;
+      }
+    });
+  }
 }
 const movePopupEvent = () => {
   if (!isPopuped.value) return;
@@ -312,6 +318,7 @@ const addPopupEvents = () => {
     });
   });
   map.on('move', movePopupEvent);
+  map.on('zoom', movePopupEvent);
 };
 watch(() => props.isrecommended, (newValue) => {
   console.log('触发');

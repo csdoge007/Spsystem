@@ -109,3 +109,5 @@ export const upload = (data) => axios.post('/upload', {
 });
 
 export const getGroupsData = () => axios.get('/getGroupsData');
+
+export const test = () => axios.get('/test');
