@@ -65,7 +65,7 @@ export async function createLayer (layerInfo) {
     INSERT INTO layer (name, type, group_name, quantity, isviewed, corporation) VALUES ($1, $2, $3, $4, $5, $6);
     `;
     const query2 = `
-    INSERT INTO layer_new (name, type, quantity, corporation) VALUES ($1, $2, $3, $4, $5, $6);
+    INSERT INTO layer_new (name, type, quantity, corporation) VALUES ($1, $2, $3, $4);
     `;
     await pool_client.query(query, [name, type, group_name, quantity, isviewed, corporation]);
     await pool_client.query(query2, [name, type, quantity, corporation]);
